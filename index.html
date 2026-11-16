@@ -1,0 +1,395 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-STORE</title>
+  <meta name="description" content="Découvrez les iPhone, chaussures, maillots et accessoires de B-STORE. Prix en FCFA, panier en ligne et confirmation de commande sur WhatsApp.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="storefront.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="announcement-bar">
+    <div class="container announcement-bar__inner">
+      <span>Livraison affichée au panier · Paiement au choix</span>
+    </div>
+  </div>
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="logo" aria-label="B-STORE, accueil">
+        <img src="assets/b-store-logo.png" alt="B-STORE">
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html#accueil">Accueil</a>
+        <a href="index.html#categories">Catégories</a>
+        <a href="index.html#produits">Boutique</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <a class="icon-btn" href="#produits" aria-label="Voir les produits">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        </a>
+        <button class="icon-btn cart-btn" id="openCart" aria-label="Ouvrir le panier">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.6L21 8H6"></path><circle cx="10" cy="20" r="1"></circle><circle cx="18" cy="20" r="1"></circle></svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="accueil">
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <span class="eyebrow"><span class="eyebrow__dot"></span> TON STYLE, TES ENVIES, TON B-STORE</span>
+          <h1>Fais-toi plaisir. <em>Le style n'attend pas&nbsp;!</em></h1>
+          <p>Smartphones, sneakers, maillots et accessoires : déniche tes coups de cœur et passe commande en quelques clics sur WhatsApp.</p>
+          <div class="hero__actions">
+            <a href="#produits" class="btn btn--primary">Découvrir la boutique <span aria-hidden="true">→</span></a>
+            <a href="#categories" class="btn btn--ghost">Voir les catégories</a>
+          </div>
+          <p class="hero__note"><span aria-hidden="true">✓</span> Prix en FCFA · Récapitulatif clair avant confirmation</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section trust">
+      <div class="container trust__grid">
+        <div class="trust-item"><span class="trust-item__icon">01</span><span><strong>Prix transparents</strong><small>Affichés en FCFA</small></span></div>
+        <div class="trust-item"><span class="trust-item__icon">02</span><span><strong>Livraison claire</strong><small>Frais indiqués au panier</small></span></div>
+        <div class="trust-item"><span class="trust-item__icon">03</span><span><strong>Paiement au choix</strong><small>Mobile money ou à la livraison</small></span></div>
+        <div class="trust-item"><span class="trust-item__icon">04</span><span><strong>Confirmation simple</strong><small>Votre commande sur WhatsApp</small></span></div>
+      </div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="container">
+        <div class="section__head">
+          <span class="section-kicker">Trouvez votre univers</span>
+          <h2>Parcourez les catégories</h2>
+          <p>Des essentiels sélectionnés pour compléter votre quotidien.</p>
+        </div>
+        <div class="categories-grid">
+          <button class="category-card" data-cat="chaussures" type="button">
+            <img class="category-card__image" src="https://assets.adidas.com/images/w_1880,f_auto,q_auto/be661c788b5a4ddbb9963b01f59c7c81_9366/JP5507_09_standard.jpg" alt="" loading="lazy">
+            <span class="category-card__icon">01</span>
+            <h3>Chaussures</h3>
+            <span class="category-card__link">Explorer <span aria-hidden="true">→</span></span>
+          </button>
+          <button class="category-card" data-cat="maillots" type="button">
+            <img class="category-card__image" src="assets/club-jersey-reference.webp" alt="" loading="lazy">
+            <span class="category-card__icon">02</span>
+            <h3>Maillots</h3>
+            <span class="category-card__link">Explorer <span aria-hidden="true">→</span></span>
+          </button>
+          <button class="category-card" data-cat="telephones" type="button">
+            <img class="category-card__image" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=900&amp;auto=format&amp;fit=crop" alt="" loading="lazy">
+            <span class="category-card__icon">03</span>
+            <h3>Téléphones</h3>
+            <span class="category-card__link">Explorer <span aria-hidden="true">→</span></span>
+          </button>
+          <button class="category-card" data-cat="electronique" type="button">
+            <img class="category-card__image" src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&amp;auto=format&amp;fit=crop" alt="" loading="lazy">
+            <span class="category-card__icon">04</span>
+            <h3>Ordinateurs &amp; PlayStation</h3>
+            <span class="category-card__link">Explorer <span aria-hidden="true">→</span></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="produits">
+      <div class="container">
+        <div class="section__head">
+          <span class="section-kicker">La boutique</span>
+          <h2>Les essentiels du moment</h2>
+          <p>Choisissez un article pour consulter ses détails ou l’ajouter directement au panier.</p>
+        </div>
+
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all" type="button">Tous</button>
+          <button class="filter-btn" data-filter="chaussures" type="button">Chaussures</button>
+          <button class="filter-btn" data-filter="maillots" type="button">Maillots</button>
+          <button class="filter-btn" data-filter="telephones" type="button">Téléphones</button>
+          <button class="filter-btn" data-filter="electronique" type="button">Ordinateurs &amp; PlayStation</button>
+        </div>
+
+        <div class="products" id="productsGrid">
+          <article class="product-card" data-cat="chaussures" data-id="p1" data-name="Sneakers adidas JP5507" data-price="18000" data-img="https://assets.adidas.com/images/w_1880,f_auto,q_auto/be661c788b5a4ddbb9963b01f59c7c81_9366/JP5507_09_standard.jpg">
+            <div class="product-card__img">
+              <img src="https://assets.adidas.com/images/w_1880,f_auto,q_auto/be661c788b5a4ddbb9963b01f59c7c81_9366/JP5507_09_standard.jpg" alt="Sneakers adidas modèle JP5507">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p1">Sneakers adidas JP5507</a></h3>
+              <div class="product-card__price">
+                <strong>18 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p1" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p1" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="maillots" data-id="p2" data-name="Maillots de clubs" data-price="5000" data-img="assets/club-jersey-reference.webp">
+            <div class="product-card__img">
+              <img src="assets/club-jersey-reference.webp" alt="Visuel illustratif d’un maillot de football de club">
+              <span class="tag">Saison actuelle</span>
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Maillots</span>
+              <h3><a href="produit.html?id=p2">Maillots des grands clubs</a></h3>
+              <div class="product-card__price">
+                <strong>À partir de 5 000 FCFA</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p2" class="btn btn--primary btn--sm">Choisir équipe et modèle</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="telephones" data-id="iphone-catalog" data-name="Téléphones iPhone" data-price="125000" data-img="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop">
+            <div class="product-card__img">
+              <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop" alt="Visuel indicatif d’un téléphone iPhone">
+              <span class="tag">Visuel indicatif</span>
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Téléphones</span>
+              <h3><a href="produit.html?id=iphone-catalog">iPhone — choisissez votre modèle</a></h3>
+              <div class="product-card__price">
+                <strong>À partir de 125 000 FCFA</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=iphone-catalog" class="btn btn--primary btn--sm">Choisir un modèle</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p4" data-name="Sneakers streetwear" data-price="18000" data-img="https://tse3.mm.bing.net/th/id/OIP.Or8mAaPGVeia2iVMZ4cLLgAAAA?r=0&amp;rs=1&amp;pid=ImgDetMain&amp;o=7&amp;rm=3">
+            <div class="product-card__img">
+              <img src="https://tse3.mm.bing.net/th/id/OIP.Or8mAaPGVeia2iVMZ4cLLgAAAA?r=0&amp;rs=1&amp;pid=ImgDetMain&amp;o=7&amp;rm=3" alt="Sneakers streetwear">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p4">Sneakers streetwear</a></h3>
+              <div class="product-card__price">
+                <strong>18 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p4" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p4" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="electronique" data-id="p6" data-name="Ordinateurs &amp; PlayStation" data-price="0" data-img="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1000&amp;auto=format&amp;fit=crop">
+            <div class="product-card__img">
+              <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1000&amp;auto=format&amp;fit=crop" alt="Ordinateur portable">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Ordinateurs &amp; PlayStation</span>
+              <h3><a href="produit.html?id=p6">Ordinateurs &amp; PlayStation</a></h3>
+              <div class="product-card__price">
+                <strong>Prix sur demande</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p6" class="btn btn--primary btn--sm">Choisir un modèle</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p7" data-name="Air Jordan 1 Low Panda" data-price="18000" data-img="https://sneakernews.com/wp-content/uploads/2022/12/air-jordan-1-low-panda-DC0774-101-5.jpg?w=1140">
+            <div class="product-card__img">
+              <img src="https://sneakernews.com/wp-content/uploads/2022/12/air-jordan-1-low-panda-DC0774-101-5.jpg?w=1140" alt="Air Jordan 1 Low Panda noir et blanc">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p7">Air Jordan 1 Low Panda</a></h3>
+              <div class="product-card__price">
+                <strong>18 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p7" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p7" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p8" data-name="Sneakers Nike noir, blanc et rouge" data-price="18000" data-img="https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw23ce58ab/nk/85d/c/9/6/b/6/85dc96b6_1cef_43ec_8cef_40e3938ac7cf.jpg">
+            <div class="product-card__img">
+              <img src="https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw23ce58ab/nk/85d/c/9/6/b/6/85dc96b6_1cef_43ec_8cef_40e3938ac7cf.jpg" alt="Sneakers Nike noir, blanc et rouge">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p8">Sneakers Nike noir, blanc et rouge</a></h3>
+              <div class="product-card__price">
+                <strong>18 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p8" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p8" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p9" data-name="Nike Air Max Plus (TN)" data-price="20000" data-img="https://tse4.mm.bing.net/th/id/OIP.UFTE8fWgxspecNigUMKzwgHaEo?r=0&amp;rs=1&amp;pid=ImgDetMain&amp;o=7&amp;rm=3">
+            <div class="product-card__img">
+              <img src="https://tse4.mm.bing.net/th/id/OIP.UFTE8fWgxspecNigUMKzwgHaEo?r=0&amp;rs=1&amp;pid=ImgDetMain&amp;o=7&amp;rm=3" alt="Nike Air Max Plus TN, autre coloris">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p9">Nike Air Max Plus (TN)</a></h3>
+              <div class="product-card__price">
+                <strong>20 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p9" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p9" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p10" data-name="Sneakers à semelle ajourée" data-price="25000" data-img="assets/sneakers-model-10-color-1.png">
+            <div class="product-card__img">
+              <img src="assets/sneakers-model-10-color-1.png" alt="Sneakers à semelle ajourée, coloris noir">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p10">Sneakers à semelle ajourée</a></h3>
+              <div class="product-card__price">
+                <strong>25 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p10" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p10" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p11" data-name="New Balance 530" data-price="17000" data-img="assets/sneakers-model-11-color-1.jpg">
+            <div class="product-card__img">
+              <img src="assets/sneakers-model-11-color-1.jpg" alt="New Balance 530, coloris blanc et gris">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p11">New Balance 530</a></h3>
+              <div class="product-card__price">
+                <strong>17 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p11" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p11" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p12" data-name="New Balance 9060" data-price="19000" data-img="assets/sneakers-model-12-color-1.jpg">
+            <div class="product-card__img">
+              <img src="assets/sneakers-model-12-color-1.jpg" alt="New Balance 9060, coloris beige">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p12">New Balance 9060</a></h3>
+              <div class="product-card__price">
+                <strong>19 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p12" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p12" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card" data-cat="chaussures" data-id="p13" data-name="ASICS Gel-Kayano 14" data-price="18000" data-img="assets/asics-gel-kayano-14-color-1.jpg">
+            <div class="product-card__img">
+              <img src="assets/asics-gel-kayano-14-color-1.jpg" alt="ASICS Gel-Kayano 14, coloris argent et noir">
+            </div>
+            <div class="product-card__body">
+              <span class="product-card__cat">Chaussures</span>
+              <h3><a href="produit.html?id=p13">ASICS Gel-Kayano 14</a></h3>
+              <div class="product-card__price">
+                <strong>18 000 FCFA / paire</strong>
+              </div>
+              <div class="product-card__actions">
+                <a href="produit.html?id=p13" class="btn btn--ghost btn--sm">Voir détails</a>
+                <a href="produit.html?id=p13" class="btn btn--primary btn--sm">Choisir les options</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-cta" id="contact">
+      <div class="container contact-cta__inner">
+        <div>
+          <span class="section-kicker">Une question avant de commander ?</span>
+          <h2>On vous accompagne, simplement.</h2>
+          <p>Contactez-nous sur WhatsApp pour vérifier un article ou obtenir de l’aide avant de valider votre panier.</p>
+        </div>
+        <a class="btn btn--light" href="https://wa.me/22670895871" target="_blank" rel="noopener noreferrer">Écrire sur WhatsApp <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="index.html" class="logo" aria-label="B-STORE, accueil">
+          <img src="assets/b-store-logo.png" alt="B-STORE">
+        </a>
+        <p>Vos essentiels mode, sport et tech, réunis au même endroit.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#accueil">Accueil</a></li>
+          <li><a href="#categories">Catégories</a></li>
+          <li><a href="#produits">Boutique</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="tel:+22670895871">+226 70 89 58 71</a></li>
+          <li><a href="mailto:brunelsawadogo90@gmail.com">brunelsawadogo90@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-modal" id="cartModal" aria-hidden="true">
+    <div class="cart-modal__overlay" data-close-cart></div>
+    <aside class="cart-modal__panel">
+      <div class="cart-modal__header">
+        <h2>Mon panier</h2>
+        <button class="cart-modal__close" data-close-cart aria-label="Fermer">✕</button>
+      </div>
+      <div class="cart-modal__body" id="cartBody"></div>
+      <div class="cart-modal__footer" id="cartFooter" hidden>
+        <div class="cart-summary-line">
+          <span>Sous-total</span>
+          <strong id="cartSubtotal">0 FCFA</strong>
+        </div>
+        <div class="cart-summary-line">
+          <span>Livraison</span>
+          <strong id="cartShipping">2 000 FCFA</strong>
+        </div>
+        <div class="cart-summary-line cart-summary-line--total">
+          <span>Total</span>
+          <strong id="cartTotal">0 FCFA</strong>
+        </div>
+        <a href="commande.html" class="btn btn--primary" style="width:100%; text-align:center;">Passer la commande →</a>
+        <button class="btn btn--ghost btn--sm" data-close-cart style="width:100%; margin-top:8px;" type="button">Continuer mes achats</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast">Produit ajouté au panier ✅</div>
+
+  <script src="script.js"></script>
+</body>
+</html>

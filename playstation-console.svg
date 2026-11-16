@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" role="img" aria-labelledby="title description">
+  <title id="title">Illustration d'une console de jeu</title>
+  <desc id="description">Console blanche et manette sur fond vert doux.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#edf3ee"/>
+      <stop offset="1" stop-color="#dbe7dc"/>
+    </linearGradient>
+    <linearGradient id="console" x1="0" x2="1">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".76" stop-color="#e7ebe8"/>
+      <stop offset="1" stop-color="#b9c4bd"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#21352a" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect width="900" height="700" rx="36" fill="url(#background)"/>
+  <circle cx="690" cy="145" r="118" fill="#fff" opacity=".34"/>
+  <ellipse cx="457" cy="581" rx="277" ry="33" fill="#53675a" opacity=".16"/>
+  <g filter="url(#shadow)">
+    <path d="M338 122c-25-10-47 8-53 40l-50 320c-5 31 16 54 44 49l58-12c18-4 30-19 33-38l49-315c5-34-22-58-53-48z" fill="url(#console)"/>
+    <path d="M562 122c25-10 47 8 53 40l50 320c5 31-16 54-44 49l-58-12c-18-4-30-19-33-38l-49-315c-5-34 22-58 53-48z" fill="#f8faf8"/>
+    <path d="M446 147h8v344h-8z" fill="#c6d0c9"/>
+    <rect x="432" y="156" width="36" height="328" rx="17" fill="#23382c"/>
+    <path d="M369 505c-11 0-22 8-27 21l-10 29c-4 11 5 23 17 23h220c12 0 21-12 17-23l-10-29c-5-13-16-21-27-21z" fill="#f7f9f7"/>
+    <path d="M273 459c-28 0-51 18-61 45l-20 54c-8 22 8 45 32 45h452c24 0 40-23 32-45l-20-54c-10-27-33-45-61-45H273z" fill="#26372e"/>
+    <path d="M305 493v53m-26-26h53" stroke="#e9f0eb" stroke-linecap="round" stroke-width="11"/>
+    <circle cx="580" cy="510" r="9" fill="#83a98f"/>
+    <circle cx="609" cy="532" r="9" fill="#e1a98e"/>
+    <circle cx="580" cy="554" r="9" fill="#a5b4db"/>
+    <circle cx="551" cy="532" r="9" fill="#e1d38f"/>
+    <path d="M408 511c14 0 25 11 25 25m60-25c-14 0-25 11-25 25" fill="none" stroke="#b8c5bd" stroke-linecap="round" stroke-width="7"/>
+  </g>
+  <text x="450" y="651" fill="#3c5444" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" text-anchor="middle">VISUEL ILLUSTRATIF</text>
+</svg>

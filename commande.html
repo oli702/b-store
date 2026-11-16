@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande — B-STORE</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="storefront.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="logo">B-STORE</a>
+      <nav class="nav" id="nav">
+        <a href="index.html">Accueil</a>
+        <a href="index.html#produits">Boutique</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn cart-btn" id="openCart" aria-label="Panier">
+          🛒 <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container checkout">
+      <div class="checkout__head">
+        <h1>Finaliser votre commande</h1>
+        <p>Remplissez vos informations puis choisissez votre mode de paiement.</p>
+      </div>
+
+      <div class="checkout__grid">
+        <form class="checkout__form" id="checkoutForm">
+          <h3>1. Vos informations</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nom">Nom complet *</label>
+              <input type="text" id="nom" name="nom" required placeholder="C Olivier Brunel SAWADOGO">
+            </div>
+            <div class="form-group">
+              <label for="tel">Téléphone (WhatsApp) *</label>
+              <input type="tel" id="tel" name="tel" required placeholder="+226 70895871">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="vous@exemple.com">
+          </div>
+
+          <h3>2. Livraison</h3>
+          <div class="form-group">
+            <label for="adresse">Adresse de livraison *</label>
+            <input type="text" id="adresse" name="adresse" required placeholder="Quartier, rue, point de repère">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ville">Ville *</label>
+              <input type="text" id="ville" name="ville" required placeholder="Ouagadougou">
+            </div>
+            <div class="form-group">
+              <label for="pays">Pays *</label>
+              <input type="text" id="pays" name="pays" required value="Burkina Faso">
+            </div>
+          </div>
+
+          <h3>3. Mode de paiement *</h3>
+          <div class="payments">
+            <label class="payment-option">
+              <input type="radio" name="paiement" value="wave" checked>
+              <span class="payment-option__body">
+                <span class="payment-option__logo" style="background:#1DC8FF; color:white;">W</span>
+                <span><strong>Wave</strong><br><small>Paiement mobile</small></span>
+              </span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="paiement" value="orange">
+              <span class="payment-option__body">
+                <span class="payment-option__logo" style="background:#FF7900; color:white;">O</span>
+                <span><strong>Orange Money</strong><br><small>Paiement mobile</small></span>
+              </span>
+            </label>
+           
+          
+            <label class="payment-option">
+              <input type="radio" name="paiement" value="cash">
+              <span class="payment-option__body">
+                <span class="payment-option__logo" style="background:#2ecc71; color:white;">💵</span>
+                <span><strong>Paiement à la livraison</strong><br><small>Cash</small></span>
+              </span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="notes">Notes (facultatif)</label>
+            <textarea id="notes" name="notes" rows="3" placeholder="Instructions particulières..."></textarea>
+          </div>
+
+          <div class="checkout__actions">
+            <button type="submit" class="btn btn--primary" style="width:100%;">✅ Confirmer via WhatsApp</button>
+            <p class="checkout__hint">Votre commande sera envoyée sur WhatsApp pour confirmation et paiement.</p>
+          </div>
+        </form>
+
+        <aside class="checkout__summary">
+          <h3>Récapitulatif</h3>
+          <div id="checkoutItems" class="checkout__items"></div>
+          <div class="cart-summary-line"><span>Sous-total</span><strong id="sumSubtotal">0 FCFA</strong></div>
+          <div class="cart-summary-line"><span>Livraison</span><strong id="sumShipping">2 000 FCFA</strong></div>
+          <div class="cart-summary-line cart-summary-line--total"><span>Total</span><strong id="sumTotal">0 FCFA</strong></div>
+          <a href="index.html#produits" class="btn btn--ghost btn--sm" style="width:100%; text-align:center; margin-top:12px;">← Modifier le panier</a>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="index.html" class="logo" aria-label="B-STORE, accueil">
+          <img src="assets/b-store-logo.png" alt="B-STORE">
+        </a>
+        <p>mode, sport et tech, réunis au même endroit.</p>
+      </div>
+      <div></div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="index.html#produits">Boutique</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Besoin d’aide ?</h4>
+        <ul>
+          <li><a href="https://wa.me/22670895871" target="_blank" rel="noopener noreferrer">Écrire sur WhatsApp</a></li>
+          <li><a href="mailto:brunelsawadogo90@gmail.com">brunelsawadogo90@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

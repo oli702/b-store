@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fiche produit — B-STORE</title>
+  <meta name="description" content="Consultez les détails des produits B-STORE et choisissez vos options avant d’ajouter au panier.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="storefront.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="announcement-bar">
+    <div class="container announcement-bar__inner">
+      <span>Livraison affichée au panier · Paiement au choix</span>
+    </div>
+  </div>
+  <header class="header">
+    <div class="container header__inner">
+      <a href="index.html" class="logo" aria-label="B-STORE, accueil">
+        <img src="assets/b-store-logo.png" alt="B-STORE">
+      </a>
+      <nav class="nav" id="nav">
+        <a href="index.html#accueil">Accueil</a>
+        <a href="index.html#categories">Catégories</a>
+        <a href="index.html#produits">Boutique</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="header__actions">
+        <button class="icon-btn cart-btn" id="openCart" aria-label="Panier">
+          🛒 <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container breadcrumb">
+    <a href="index.html">Accueil</a> › <a href="index.html#produits">Boutique</a> › <span id="crumbName">Produit</span>
+  </div>
+
+  <section class="section">
+    <div class="container product-detail" id="productDetail"></div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section__head">
+        <h2>Vous aimerez aussi</h2>
+      </div>
+      <div class="products" id="relatedProducts"></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div>
+        <a href="index.html" class="logo" aria-label="B-STORE, accueil">
+          <img src="assets/b-store-logo.png" alt="B-STORE">
+        </a>
+        <p>Vos essentiels mode, sport et tech, réunis au même endroit.</p>
+      </div>
+      <div>
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="index.html#produits">Boutique</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Besoin d’aide ?</h4>
+        <ul>
+          <li><a href="https://wa.me/22670895871" target="_blank" rel="noopener noreferrer">Écrire sur WhatsApp</a></li>
+          <li><a href="mailto:brunelsawadogo90@gmail.com">brunelsawadogo90@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cart-modal" id="cartModal" aria-hidden="true">
+    <div class="cart-modal__overlay" data-close-cart></div>
+    <aside class="cart-modal__panel">
+      <div class="cart-modal__header">
+        <h2>Mon panier</h2>
+        <button class="cart-modal__close" data-close-cart aria-label="Fermer">✕</button>
+      </div>
+      <div class="cart-modal__body" id="cartBody"></div>
+      <div class="cart-modal__footer" id="cartFooter" hidden>
+        <div class="cart-summary-line"><span>Sous-total</span><strong id="cartSubtotal">0 FCFA</strong></div>
+        <div class="cart-summary-line"><span>Livraison</span><strong id="cartShipping">2 000 FCFA</strong></div>
+        <div class="cart-summary-line cart-summary-line--total"><span>Total</span><strong id="cartTotal">0 FCFA</strong></div>
+        <a href="commande.html" class="btn btn--primary" style="width:100%; text-align:center;">Passer la commande →</a>
+        <button class="btn btn--ghost btn--sm" data-close-cart style="width:100%; margin-top:8px;" type="button">Continuer mes achats</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast">Produit ajouté au panier ✅</div>
+
+  <script src="script.js"></script>
+</body>
+</html>
