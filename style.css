@@ -1,4 +1,4 @@
-/* ===== ACTIONS PRODUIT (2 boutons) ===== */
+﻿/* ===== ACTIONS PRODUIT (2 boutons) ===== */
 .product-card__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
