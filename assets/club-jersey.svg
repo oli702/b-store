@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" role="img" aria-labelledby="title description">
+  <title id="title">Maillot de football de club</title>
+  <desc id="description">Illustration originale d'un maillot de football, sans écusson de club.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f0f3ed"/>
+      <stop offset="1" stop-color="#dce6db"/>
+    </linearGradient>
+    <linearGradient id="shirt" x1="0" x2="1">
+      <stop offset="0" stop-color="#244b3a"/>
+      <stop offset=".5" stop-color="#337451"/>
+      <stop offset="1" stop-color="#1b3c2d"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#21352a" flood-opacity=".2"/>
+    </filter>
+  </defs>
+  <rect width="900" height="700" rx="36" fill="url(#bg)"/>
+  <circle cx="688" cy="142" r="118" fill="#fff" opacity=".35"/>
+  <ellipse cx="451" cy="591" rx="210" ry="28" fill="#53675a" opacity=".16"/>
+  <g filter="url(#shadow)">
+    <path d="m337 142 73-43c19 25 43 38 68 38s49-13 68-38l73 43 112 74-59 101-64-37v273H248V280l-64 37-59-101z" fill="url(#shirt)"/>
+    <path d="m410 99 68 57 68-57c-19 25-43 38-68 38s-49-13-68-38z" fill="#f3f5f0"/>
+    <path d="M450 167h10v350h-10z" fill="#e9eee8" opacity=".17"/>
+    <path d="M251 280 187 317m462-37 64 37M252 521h395" fill="none" stroke="#d7e3d8" stroke-opacity=".24" stroke-width="8"/>
+    <circle cx="544" cy="251" r="32" fill="#f2f3ea" opacity=".94"/>
+    <path d="m544 229 7 15 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z" fill="#347451"/>
+    <text x="450" y="411" fill="#fff" font-family="Arial, sans-serif" font-size="94" font-weight="700" text-anchor="middle">10</text>
+    <text x="450" y="459" fill="#dbe8dc" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" text-anchor="middle">VOTRE CLUB</text>
+  </g>
+  <text x="450" y="656" fill="#3c5444" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" text-anchor="middle">VISUEL ILLUSTRATIF</text>
+</svg>
