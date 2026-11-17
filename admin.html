@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Administration — B-STORE</title>
+  <link rel="stylesheet" href="storefront.css">
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <a class="admin-brand" href="index.html">
+      <img src="assets/b-store-logo.png" alt="B-STORE">
+      <span>Gestion du stock</span>
+    </a>
+    <a class="admin-back" href="index.html">Retour à la boutique</a>
+  </header>
+
+  <main class="admin-main">
+    <div id="adminStatus" class="admin-status" role="status" aria-live="polite" hidden></div>
+
+    <section id="adminLoginPanel" class="admin-panel admin-login">
+      <p class="admin-kicker">Espace réservé</p>
+      <h1>Administration B-STORE</h1>
+      <p class="admin-muted">Connecte-toi avec le compte administrateur autorisé.</p>
+      <form id="adminLoginForm">
+        <label for="adminEmail">Adresse e-mail</label>
+        <input id="adminEmail" name="email" type="email" autocomplete="username" required>
+        <label for="adminPassword">Mot de passe</label>
+        <input id="adminPassword" name="password" type="password" autocomplete="current-password" required>
+        <button class="admin-button" type="submit">Se connecter</button>
+      </form>
+    </section>
+
+    <section id="adminDashboard" hidden>
+      <div class="admin-heading">
+        <div>
+          <p class="admin-kicker">Tableau de bord</p>
+          <h1>Produits et stock</h1>
+          <p id="adminIdentity" class="admin-muted"></p>
+        </div>
+        <button id="adminLogout" class="admin-button admin-button--secondary" type="button">Se déconnecter</button>
+      </div>
+
+      <div class="admin-layout">
+        <section class="admin-panel">
+          <div class="admin-panel__heading">
+            <div>
+              <h2 id="productFormTitle">Ajouter un produit</h2>
+              <p class="admin-muted">Les produits actifs apparaissent dans la boutique.</p>
+            </div>
+          </div>
+          <form id="productForm" class="admin-product-form">
+            <input id="productId" type="hidden">
+            <label for="productName">Nom du produit</label>
+            <input id="productName" name="name" maxlength="120" required>
+
+            <div class="admin-form-row">
+              <div>
+                <label for="productCategory">Catégorie</label>
+                <select id="productCategory" name="category" required>
+                  <option value="chaussures">Chaussures</option>
+                  <option value="maillots">Maillots</option>
+                  <option value="telephones">Téléphones</option>
+                  <option value="electronique">Ordinateurs &amp; PlayStation</option>
+                </select>
+              </div>
+              <div>
+                <label for="productPrice">Prix (FCFA)</label>
+                <input id="productPrice" name="price" type="number" min="0" step="1" required>
+              </div>
+            </div>
+
+            <div class="admin-form-row">
+              <div>
+                <label for="productStock">Quantité en stock</label>
+                <input id="productStock" name="stock" type="number" min="0" step="1" required>
+              </div>
+              <div>
+                <label for="productSizes">Tailles / pointures (facultatif)</label>
+                <input id="productSizes" name="sizes" placeholder="Ex. 39, 40, 41">
+              </div>
+            </div>
+
+            <label for="productImageFile">Photo du produit</label>
+            <input id="productImageFile" name="imageFile" type="file" accept="image/*">
+            <label for="productImageUrl">Ou adresse de l’image</label>
+            <input id="productImageUrl" name="imageUrl" type="url" placeholder="https://...">
+            <label for="productDescription">Description</label>
+            <textarea id="productDescription" name="description" rows="4" maxlength="1000"></textarea>
+            <label class="admin-checkbox">
+              <input id="productActive" name="active" type="checkbox" checked>
+              Publier ce produit dans la boutique
+            </label>
+            <div class="admin-form-actions">
+              <button class="admin-button" type="submit">Enregistrer le produit</button>
+              <button id="cancelProductEdit" class="admin-button admin-button--secondary" type="button" hidden>Annuler</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="admin-panel admin-inventory">
+          <div class="admin-panel__heading">
+            <div>
+              <h2>Inventaire</h2>
+              <p class="admin-muted">Modifie le stock ou désactive un produit sans le supprimer.</p>
+            </div>
+            <span id="productCount" class="admin-count">0 produits</span>
+          </div>
+          <div id="inventoryList" class="inventory-list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

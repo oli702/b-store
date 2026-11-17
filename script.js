@@ -7,6 +7,13 @@
 const formatPrice = (n) => Number(n || 0).toLocaleString('fr-FR', { maximumFractionDigits: 0 }) + ' FCFA';
 const SHIPPING_FEE = 2000;
 const IPHONE_IMAGE = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&auto=format&fit=crop';
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+})[character]);
 const TECH_REQUEST_IMAGES = {
   computer: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1000&auto=format&fit=crop',
   playstation: 'assets/playstation-console.svg'
@@ -280,6 +287,94 @@ const CATALOG = {
   p28: createIPhoneProduct('p28', 'iPhone 18 Pro Max', 1150000)
 };
 
+function mapManagedProduct(row) {
+  const categoryLabels = {
+    chaussures: 'Chaussures',
+    maillots: 'Maillots',
+    telephones: 'Téléphones',
+    electronique: 'Ordinateurs & PlayStation'
+  };
+  const imageUrl = new URL(row.image_url, window.location.href);
+  if (!['http:', 'https:'].includes(imageUrl.protocol)) {
+    throw new Error(`L’image du produit « ${row.name} » doit utiliser une adresse HTTP ou HTTPS.`);
+  }
+
+  return {
+    id: row.id,
+    name: row.name,
+    price: Number(row.price),
+    oldPrice: null,
+    cat: categoryLabels[row.category],
+    category: row.category,
+    optionLabel: row.category === 'chaussures' ? 'Pointure' : 'Taille',
+    img: imageUrl.href,
+    gallery: [imageUrl.href],
+    desc: row.description || '',
+    sizes: Array.isArray(row.sizes) ? row.sizes : [],
+    colors: [],
+    features: ['Disponibilité à confirmer avant commande'],
+    managed: true
+  };
+}
+
+function renderManagedProductCard(product) {
+  return `
+    <article class="product-card managed-product-card" data-cat="${escapeHtml(product.category)}" data-id="${escapeHtml(product.id)}">
+      <div class="product-card__img">
+        <img src="${escapeHtml(product.img)}" alt="${escapeHtml(product.name)}" loading="lazy">
+      </div>
+      <div class="product-card__body">
+        <span class="product-card__cat">${escapeHtml(product.cat)}</span>
+        <h3><a href="produit.html?id=${encodeURIComponent(product.id)}">${escapeHtml(product.name)}</a></h3>
+        <div class="product-card__price"><strong>${formatPrice(product.price)}</strong></div>
+        <div class="product-card__actions">
+          <a href="produit.html?id=${encodeURIComponent(product.id)}" class="btn btn--primary btn--sm">Voir le produit</a>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+let managedCatalogLoadError = false;
+
+async function loadManagedProducts() {
+  const config = window.BSTORE_SUPABASE_CONFIG;
+  const supabase = window.supabase;
+  if (!config?.url && !config?.anonKey) return;
+
+  try {
+    if (!config?.url || !config?.anonKey) {
+      throw new Error('La configuration Supabase est incomplète.');
+    }
+    if (!supabase?.createClient) {
+      throw new Error('La bibliothèque Supabase n’a pas pu être chargée.');
+    }
+
+    const client = supabase.createClient(config.url, config.anonKey);
+    const { data, error } = await client
+      .from('products')
+      .select('id, name, category, price, image_url, description, sizes')
+      .eq('active', true)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    const grid = document.getElementById('productsGrid');
+    data.forEach((row) => {
+      const product = mapManagedProduct(row);
+      CATALOG[product.id] = product;
+      if (grid) grid.insertAdjacentHTML('beforeend', renderManagedProductCard(product));
+    });
+  } catch (error) {
+    managedCatalogLoadError = true;
+    console.error('Impossible de charger le catalogue Supabase :', error);
+    const status = document.getElementById('managedCatalogStatus');
+    if (status) {
+      status.textContent = 'Certains produits n’ont pas pu être chargés. Réessaie dans quelques instants.';
+      status.hidden = false;
+    }
+  }
+}
+
 const Cart = {
   key: 'b-store_cart',
 
@@ -300,7 +395,6 @@ const Cart = {
     const items = this.load();
     const key = [product.id, size, color].filter(Boolean).join('__');
     const existing = items.find((item) => item.key === key);
-
     if (existing) {
       existing.qty += qty;
     } else {
@@ -319,6 +413,7 @@ const Cart = {
 
     this.save(items);
     showToast(`${product.name} ajouté au panier ✅`);
+    return true;
   },
 
   remove(key) {
@@ -373,7 +468,7 @@ function renderCartOptions(item) {
   ].filter(Boolean);
 
   return options.map((option) => `
-    <div style="font-size:11px;color:#888;margin-bottom:2px;">${option}</div>
+    <div style="font-size:11px;color:#888;margin-bottom:2px;">${escapeHtml(option)}</div>
   `).join('');
 }
 
@@ -395,20 +490,20 @@ function renderCartBody() {
   }
 
   body.innerHTML = items.map((item) => `
-    <div class="cart-item" data-key="${item.key}">
-      <img class="cart-item__img" src="${item.img}" alt="${item.name}">
+    <div class="cart-item" data-key="${escapeHtml(item.key)}">
+      <img class="cart-item__img" src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}">
       <div class="cart-item__info">
-        <h4>${item.name}</h4>
+        <h4>${escapeHtml(item.name)}</h4>
         ${renderCartOptions(item)}
         <div class="cart-item__price">${formatPrice(item.price)}</div>
       </div>
       <div class="cart-item__controls">
         <div class="qty-controls">
-          <button class="qty-btn" data-action="minus" data-key="${item.key}" type="button">−</button>
-          <span class="qty-value">${item.qty}</span>
-          <button class="qty-btn" data-action="plus" data-key="${item.key}" type="button">+</button>
+          <button class="qty-btn" data-action="minus" data-key="${escapeHtml(item.key)}" type="button">−</button>
+          <span class="qty-value">${Number(item.qty) || 0}</span>
+          <button class="qty-btn" data-action="plus" data-key="${escapeHtml(item.key)}" type="button">+</button>
         </div>
-        <button class="cart-item__remove" data-action="remove" data-key="${item.key}" type="button">Retirer</button>
+        <button class="cart-item__remove" data-action="remove" data-key="${escapeHtml(item.key)}" type="button">Retirer</button>
       </div>
     </div>
   `).join('');
@@ -447,9 +542,9 @@ function renderCheckout() {
 
   container.innerHTML = items.map((item) => `
     <div class="cart-item">
-      <img class="cart-item__img" src="${item.img}" alt="${item.name}">
+      <img class="cart-item__img" src="${escapeHtml(item.img)}" alt="${escapeHtml(item.name)}">
       <div class="cart-item__info">
-        <h4>${item.name}</h4>
+        <h4>${escapeHtml(item.name)}</h4>
         ${renderCartOptions(item)}
         <div class="cart-item__controls">
           <div class="cart-item__price">${item.qty} × ${formatPrice(item.price)}</div>
@@ -545,7 +640,6 @@ function setupMobileMenu() {
 
 function setupFilters() {
   const filterBtns = document.querySelectorAll('.filter-btn');
-  const products = document.querySelectorAll('.product-card');
   if (!filterBtns.length) return;
 
   filterBtns.forEach((button) => {
@@ -554,7 +648,7 @@ function setupFilters() {
       button.classList.add('active');
 
       const filter = button.dataset.filter;
-      products.forEach((product) => {
+      document.querySelectorAll('.product-card').forEach((product) => {
         product.classList.toggle('hidden', filter !== 'all' && product.dataset.cat !== filter);
       });
     });
@@ -578,7 +672,15 @@ function setupProductPage() {
   const isPhoneCatalog = id === 'iphone-catalog';
   const isTechRequest = id === 'p6';
   const isJerseyCatalog = id === 'p2';
-  const product = CATALOG[id] || (isPhoneCatalog ? CATALOG.p14 : CATALOG.p1);
+  const isManagedId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+  const product = CATALOG[id] || (isPhoneCatalog ? CATALOG.p14 : isManagedId ? null : CATALOG.p1);
+  if (!product) {
+    const message = managedCatalogLoadError
+      ? 'Impossible de charger ce produit pour le moment. Réessaie dans quelques instants.'
+      : 'Ce produit est introuvable ou n’est plus publié dans la boutique.';
+    container.innerHTML = `<p class="catalog-status" role="alert">${message}</p>`;
+    return;
+  }
   const phoneDisplayOrder = ['p14', 'p15', 'p16', 'p17', 'p18', 'p19', 'p20', 'p21', 'p3', 'p25', 'p22', 'p24', 'p23', 'p26', 'p27', 'p28'];
   const jerseyTeams = ['Paris Saint-Germain (PSG)', 'FC Barcelone', 'Bayern Munich', 'Manchester United', 'Manchester City', 'Chelsea', 'Atlético Madrid'];
   let selectedJerseyTeam = jerseyTeams[0];
@@ -596,19 +698,19 @@ function setupProductPage() {
   container.innerHTML = `
     <div class="product-gallery">
       <div class="product-gallery__main">
-        <img id="mainImg" src="${product.gallery[0]}" alt="${isTechRequest ? 'Ordinateur portable' : isPhoneCatalog ? 'Visuel indicatif d’un téléphone iPhone' : product.name}">
+        <img id="mainImg" src="${escapeHtml(product.gallery[0])}" alt="${isTechRequest ? 'Ordinateur portable' : isPhoneCatalog ? 'Visuel indicatif d’un téléphone iPhone' : escapeHtml(product.name)}">
       </div>
       <div class="product-gallery__thumbs">
         ${product.gallery.map((src, index) => `
-          <img src="${src}" alt="Vue ${index + 1}" class="${index === 0 ? 'active' : ''}" data-src="${src}">
+          <img src="${escapeHtml(src)}" alt="Vue ${index + 1}" class="${index === 0 ? 'active' : ''}" data-src="${escapeHtml(src)}">
         `).join('')}
       </div>
     </div>
 
     <div class="product-info">
-      <span style="color:var(--primary); font-weight:600; font-size:13px; text-transform:uppercase;">${product.cat}</span>
-      <h1>${isPhoneCatalog ? 'Téléphones iPhone' : isJerseyCatalog ? 'Maillots des grands clubs' : product.name}</h1>
-      <p class="product-info__availability"><span></span> ${isTechRequest ? 'Demande de prix et disponibilité' : isPhoneCatalog || isJerseyCatalog ? 'Disponibilité à confirmer' : 'Disponible à la commande'}</p>
+      <span style="color:var(--primary); font-weight:600; font-size:13px; text-transform:uppercase;">${escapeHtml(product.cat)}</span>
+      <h1>${isPhoneCatalog ? 'Téléphones iPhone' : isJerseyCatalog ? 'Maillots des grands clubs' : escapeHtml(product.name)}</h1>
+      <p class="product-info__availability"><span></span> ${isTechRequest ? 'Demande de prix et disponibilité' : isPhoneCatalog || isJerseyCatalog || product.managed ? 'Disponibilité à confirmer' : 'Disponible à la commande'}</p>
       ${isTechRequest ? '' : `
         <div class="product-info__price">
           <strong id="detailPrice">${formatPrice(product.price)}</strong>
@@ -621,7 +723,7 @@ function setupProductPage() {
         ? 'Maillots de la saison actuelle. Choisissez une équipe, la version simple ou pro et votre taille ; le prix s’actualise automatiquement.'
         : isPhoneCatalog
         ? 'Choisissez le modèle et la capacité dans la liste. Le prix affiché se met à jour automatiquement. La photo est un visuel indicatif.'
-        : product.desc}</p>
+        : escapeHtml(product.desc)}</p>
 
       ${isJerseyCatalog ? `
         <div class="product-info__options">
@@ -692,7 +794,7 @@ function setupProductPage() {
           <span class="option-label">${product.optionLabel || (product.category === 'chaussures' ? 'Pointure' : 'Taille')} :</span>
           <div class="size-options" id="sizeOptions">
             ${productSizes.map((size, index) => `
-              <button class="size-btn ${index === 0 ? 'active' : ''}" type="button" data-size="${size}" aria-pressed="${index === 0}">${size}</button>
+              <button class="size-btn ${index === 0 ? 'active' : ''}" type="button" data-size="${escapeHtml(size)}" aria-pressed="${index === 0}">${escapeHtml(size)}</button>
             `).join('')}
           </div>
         </div>
@@ -714,7 +816,7 @@ function setupProductPage() {
       `}
 
       <ul class="product-features" id="productFeatures">
-        ${product.features.map((feature) => `<li>${feature}</li>`).join('')}
+        ${product.features.map((feature) => `<li>${escapeHtml(feature)}</li>`).join('')}
       </ul>
     </div>
   `;
@@ -861,15 +963,17 @@ function setupProductPage() {
           id: selectedPhone.id,
           name: selectedPhone.name,
           price: selectedPhone.price,
-          img: selectedColor?.img || selectedPhone.img
+          img: selectedColor?.img || selectedPhone.img,
+          stock: selectedPhone.stock
         };
-    Cart.add(
+    const added = Cart.add(
       cartProduct,
       qty,
       selectedSize,
       selectedColor?.name || null,
       product.optionLabel || (product.category === 'chaussures' ? 'Pointure' : 'Taille')
     );
+    if (!added) return;
     const cartModal = document.getElementById('cartModal');
     cartModal?.classList.add('open');
     cartModal?.setAttribute('aria-hidden', 'false');
@@ -898,20 +1002,20 @@ function renderRelated(current) {
   }
 
   container.innerHTML = related.map((product) => `
-    <article class="product-card" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" data-cat="${product.category}">
+    <article class="product-card" data-id="${escapeHtml(product.id)}" data-name="${escapeHtml(product.name)}" data-price="${product.price}" data-img="${escapeHtml(product.img)}" data-cat="${escapeHtml(product.category)}">
       <div class="product-card__img">
-        <img src="${product.img}" alt="${product.name}">
+        <img src="${escapeHtml(product.img)}" alt="${escapeHtml(product.name)}">
       </div>
       <div class="product-card__body">
-        <span class="product-card__cat">${product.cat}</span>
-        <h3><a href="produit.html?id=${product.id}">${product.name}</a></h3>
+        <span class="product-card__cat">${escapeHtml(product.cat)}</span>
+        <h3><a href="produit.html?id=${encodeURIComponent(product.id)}">${escapeHtml(product.name)}</a></h3>
         <div class="product-card__price">
           <strong>${formatPrice(product.price)}</strong>
           ${product.oldPrice ? `<s>${formatPrice(product.oldPrice)}</s>` : ''}
         </div>
         <div class="product-card__actions">
-          <a href="produit.html?id=${product.id}" class="btn btn--ghost btn--sm">Voir</a>
-          <a href="produit.html?id=${product.id}" class="btn btn--primary btn--sm">Choisir les options</a>
+          <a href="produit.html?id=${encodeURIComponent(product.id)}" class="btn btn--ghost btn--sm">Voir</a>
+          <a href="produit.html?id=${encodeURIComponent(product.id)}" class="btn btn--primary btn--sm">Choisir les options</a>
         </div>
       </div>
     </article>
@@ -988,13 +1092,15 @@ function setupCheckoutForm() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  setupMobileMenu();
-  setupFilters();
-  setupAddToCart();
-  setupCartModal();
-  setupProductPage();
-  setupCheckoutForm();
-  Cart.updateUI();
+  loadManagedProducts().finally(() => {
+    setupMobileMenu();
+    setupFilters();
+    setupAddToCart();
+    setupCartModal();
+    setupProductPage();
+    setupCheckoutForm();
+    Cart.updateUI();
+  });
 });
 
 window.addEventListener('storage', (event) => {
