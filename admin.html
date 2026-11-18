@@ -3,18 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
   <title>Administration — B-STORE</title>
-  <link rel="stylesheet" href="storefront.css">
   <link rel="stylesheet" href="admin.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="admin-page">
+<body>
   <header class="admin-header">
-    <a class="admin-brand" href="index.html">
-      <img src="assets/b-store-logo.png" alt="B-STORE">
-      <span>Gestion du stock</span>
-    </a>
+    <a class="admin-brand" href="index.html">B-STORE <span>Gestion de la boutique</span></a>
     <a class="admin-back" href="index.html">Retour à la boutique</a>
   </header>
 
@@ -38,80 +32,95 @@
       <div class="admin-heading">
         <div>
           <p class="admin-kicker">Tableau de bord</p>
-          <h1>Produits et stock</h1>
+          <h1>Gestion de la boutique</h1>
           <p id="adminIdentity" class="admin-muted"></p>
         </div>
         <button id="adminLogout" class="admin-button admin-button--secondary" type="button">Se déconnecter</button>
       </div>
 
-      <div class="admin-layout">
+      <nav class="admin-tabs" aria-label="Sections de gestion">
+        <button class="admin-tab is-active" type="button" data-admin-view="inventory" aria-pressed="true">Produits et stock</button>
+        <button class="admin-tab" type="button" data-admin-view="orders" aria-pressed="false">Commandes</button>
+      </nav>
+
+      <section id="inventoryView" class="admin-layout" aria-label="Produits et stock">
+        <form id="productForm" class="admin-panel admin-product-form">
+          <input id="productId" type="hidden">
+          <p class="admin-kicker">Inventaire</p>
+          <h2 id="productFormTitle">Ajouter un produit</h2>
+          <label for="productName">Nom du produit</label>
+          <input id="productName" maxlength="120" required>
+          <label for="productCategory">Catégorie</label>
+          <select id="productCategory" required>
+            <option value="chaussures">Chaussures</option>
+            <option value="maillots">Maillots</option>
+            <option value="telephones">Téléphones</option>
+            <option value="electronique">Ordinateurs &amp; PlayStation</option>
+          </select>
+          <label for="productPrice">Prix (FCFA)</label>
+          <input id="productPrice" type="number" min="0" step="1" required>
+          <label for="productStock">Stock</label>
+          <input id="productStock" type="number" min="0" step="1" required>
+          <label for="productImage">Adresse de la photo</label>
+          <input id="productImage" type="url" required placeholder="https://...">
+          <label for="productSizes">Tailles / options (séparées par des virgules)</label>
+          <input id="productSizes" placeholder="38, 39, 40, 41, 42, 43, 44, 45">
+          <label for="productDescription">Description</label>
+          <textarea id="productDescription" rows="3"></textarea>
+          <label class="admin-checkbox"><input id="productActive" type="checkbox" checked> Publier dans la boutique</label>
+          <div class="admin-actions">
+            <button class="admin-button" type="submit">Enregistrer le produit</button>
+            <button id="cancelProductEdit" class="admin-button admin-button--secondary" type="button" hidden>Annuler</button>
+          </div>
+        </form>
+
         <section class="admin-panel">
           <div class="admin-panel__heading">
             <div>
-              <h2 id="productFormTitle">Ajouter un produit</h2>
-              <p class="admin-muted">Les produits actifs apparaissent dans la boutique.</p>
+              <p class="admin-kicker">Catalogue</p>
+              <h2>Produits et stock</h2>
             </div>
+            <button id="refreshInventory" class="admin-button admin-button--secondary" type="button">Actualiser</button>
           </div>
-          <form id="productForm" class="admin-product-form">
-            <input id="productId" type="hidden">
-            <label for="productName">Nom du produit</label>
-            <input id="productName" name="name" maxlength="120" required>
-
-            <div class="admin-form-row">
-              <div>
-                <label for="productCategory">Catégorie</label>
-                <select id="productCategory" name="category" required>
-                  <option value="chaussures">Chaussures</option>
-                  <option value="maillots">Maillots</option>
-                  <option value="telephones">Téléphones</option>
-                  <option value="electronique">Ordinateurs &amp; PlayStation</option>
-                </select>
-              </div>
-              <div>
-                <label for="productPrice">Prix (FCFA)</label>
-                <input id="productPrice" name="price" type="number" min="0" step="1" required>
-              </div>
-            </div>
-
-            <div class="admin-form-row">
-              <div>
-                <label for="productStock">Quantité en stock</label>
-                <input id="productStock" name="stock" type="number" min="0" step="1" required>
-              </div>
-              <div>
-                <label for="productSizes">Tailles / pointures (facultatif)</label>
-                <input id="productSizes" name="sizes" placeholder="Ex. 39, 40, 41">
-              </div>
-            </div>
-
-            <label for="productImageFile">Photo du produit</label>
-            <input id="productImageFile" name="imageFile" type="file" accept="image/*">
-            <label for="productImageUrl">Ou adresse de l’image</label>
-            <input id="productImageUrl" name="imageUrl" type="url" placeholder="https://...">
-            <label for="productDescription">Description</label>
-            <textarea id="productDescription" name="description" rows="4" maxlength="1000"></textarea>
-            <label class="admin-checkbox">
-              <input id="productActive" name="active" type="checkbox" checked>
-              Publier ce produit dans la boutique
-            </label>
-            <div class="admin-form-actions">
-              <button class="admin-button" type="submit">Enregistrer le produit</button>
-              <button id="cancelProductEdit" class="admin-button admin-button--secondary" type="button" hidden>Annuler</button>
-            </div>
-          </form>
+          <div id="inventoryList" class="inventory-list" aria-live="polite"></div>
         </section>
+      </section>
 
-        <section class="admin-panel admin-inventory">
+      <section id="ordersView" class="admin-orders" aria-label="Commandes" hidden>
+        <div class="order-metrics">
+          <article class="admin-panel order-metric"><span>Nouvelles commandes</span><strong id="newOrderCount">0</strong></article>
+          <article class="admin-panel order-metric"><span>Montant encaissé</span><strong id="collectedAmount">0 FCFA</strong></article>
+          <article class="admin-panel order-metric"><span>Reste à encaisser</span><strong id="outstandingAmount">0 FCFA</strong></article>
+        </div>
+        <section class="admin-panel orders-panel">
           <div class="admin-panel__heading">
-            <div>
-              <h2>Inventaire</h2>
-              <p class="admin-muted">Modifie le stock ou désactive un produit sans le supprimer.</p>
+            <div><p class="admin-kicker">Suivi</p><h2>Commandes</h2></div>
+            <div class="admin-actions">
+              <button id="refreshOrders" class="admin-button admin-button--secondary" type="button">Actualiser</button>
+              <button id="exportOrders" class="admin-button" type="button">Exporter CSV</button>
             </div>
-            <span id="productCount" class="admin-count">0 produits</span>
           </div>
-          <div id="inventoryList" class="inventory-list"></div>
+          <div class="order-filters">
+            <label>Rechercher<input id="orderSearch" type="search" placeholder="Référence, nom ou téléphone"></label>
+            <label>Paiement
+              <select id="paymentFilter">
+                <option value="">Tous</option><option value="pending">En attente</option>
+                <option value="paid">Payé</option><option value="failed">Échoué</option>
+                <option value="refunded">Remboursé</option>
+              </select>
+            </label>
+            <label>Remise
+              <select id="deliveryFilter">
+                <option value="">Toutes</option><option value="new">Nouvelle</option>
+                <option value="confirmed">Confirmée</option><option value="shipping">En livraison</option>
+                <option value="delivered">Livrée</option><option value="canceled">Annulée</option>
+              </select>
+            </label>
+          </div>
+          <p id="ordersCount" class="admin-muted" aria-live="polite"></p>
+          <div id="ordersList" class="orders-list"><p class="admin-muted">Sélectionne l’onglet Commandes pour charger les commandes.</p></div>
         </section>
-      </div>
+      </section>
     </section>
   </main>
 
