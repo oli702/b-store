@@ -55,11 +55,11 @@ const CATALOG = {
       'https://assets.adidas.com/images/w_1880,f_auto,q_auto/be661c788b5a4ddbb9963b01f59c7c81_9366/JP5507_09_standard.jpg'
     ],
     desc: 'Sneakers adidas modèle JP5507. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Coloris présenté', hex: '#d8d1c3', img: 'https://assets.adidas.com/images/w_1880,f_auto,q_auto/be661c788b5a4ddbb9963b01f59c7c81_9366/JP5507_09_standard.jpg' }
     ],
-    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 44', 'Coloris présenté sur la photo']
+    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 45', 'Coloris présenté sur la photo']
   },
   p2: {
     id: 'p2',
@@ -102,11 +102,11 @@ const CATALOG = {
       'https://tse3.mm.bing.net/th/id/OIP.Or8mAaPGVeia2iVMZ4cLLgAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
     ],
     desc: 'Sneakers streetwear sélectionnées par B-STORE. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['38', '39', '40', '41', '42', '43'],
+    sizes: ['38', '39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Coloris présenté', hex: '#d7d4cf', img: 'https://tse3.mm.bing.net/th/id/OIP.Or8mAaPGVeia2iVMZ4cLLgAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3' }
     ],
-    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 38 à 43', 'Coloris présenté sur la photo']
+    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 38 à 45', 'Coloris présenté sur la photo']
   },
   p6: {
     id: 'p6',
@@ -133,11 +133,11 @@ const CATALOG = {
       'https://sneakernews.com/wp-content/uploads/2022/12/air-jordan-1-low-panda-DC0774-101-5.jpg?w=1140'
     ],
     desc: 'Air Jordan 1 Low Panda, coloris noir et blanc. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Noir / blanc', hex: '#292929', img: 'https://sneakernews.com/wp-content/uploads/2022/12/air-jordan-1-low-panda-DC0774-101-5.jpg?w=1140' }
     ],
-    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 44', 'Coloris présenté sur la photo']
+    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 45', 'Coloris présenté sur la photo']
   },
   p8: {
     id: 'p8',
@@ -156,7 +156,7 @@ const CATALOG = {
     colors: [
       { name: 'Noir / blanc / rouge', hex: '#292929', img: 'https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw23ce58ab/nk/85d/c/9/6/b/6/85dc96b6_1cef_43ec_8cef_40e3938ac7cf.jpg' }
     ],
-    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 44', 'Coloris présenté sur la photo']
+    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 45', 'Coloris présenté sur la photo']
   },
   p9: {
     id: 'p9',
@@ -200,12 +200,12 @@ const CATALOG = {
       'assets/sneakers-model-10-color-2.jpg'
     ],
     desc: 'Sneakers à semelle ajourée proposées en noir et en blanc. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Noir', hex: '#252525', img: 'assets/sneakers-model-10-color-1.png' },
       { name: 'Blanc', hex: '#f4f4f1', img: 'assets/sneakers-model-10-color-2.jpg' }
     ],
-    features: ['Prix unitaire : 25 000 FCFA', 'Pointures 39 à 44', 'Deux coloris au choix']
+    features: ['Prix unitaire : 25 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
   p11: {
     id: 'p11',
@@ -263,12 +263,12 @@ const CATALOG = {
       'assets/asics-gel-kayano-14-color-2.jpg'
     ],
     desc: 'ASICS Gel-Kayano 14 proposée en argent/noir et en rose. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Argent / noir', hex: '#777a7b', img: 'assets/asics-gel-kayano-14-color-1.jpg' },
       { name: 'Rose', hex: '#e5c4c9', img: 'assets/asics-gel-kayano-14-color-2.jpg' }
     ],
-    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 44', 'Deux coloris au choix']
+    features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
   p14: createIPhoneProduct('p14', 'iPhone 11', 125000),
   p15: createIPhoneProduct('p15', 'iPhone 12 128 Go', 140000, '128 Go'),
@@ -310,7 +310,9 @@ function mapManagedProduct(row) {
     img: imageUrl.href,
     gallery: [imageUrl.href],
     desc: row.description || '',
-    sizes: Array.isArray(row.sizes) ? row.sizes : [],
+    sizes: Array.isArray(row.sizes) && row.sizes.length
+      ? row.sizes
+      : row.category === 'chaussures' ? ['39', '40', '41', '42', '43', '44', '45'] : [],
     colors: [],
     features: ['Disponibilité à confirmer avant commande'],
     managed: true
@@ -792,6 +794,14 @@ function setupProductPage() {
         </div>
       ` : ''}
 
+      ${product.category === 'chaussures' ? `
+        <div class="product-info__options">
+          <label class="option-label" for="requestedShoeColor">Couleur souhaitée (facultatif) :</label>
+          <input class="product-select" id="requestedShoeColor" type="text" maxlength="80" placeholder="Ex. beige, bleu marine">
+          <small class="color-request-hint">Coloris selon disponibilité du stock.</small>
+        </div>
+      ` : ''}
+
       ${productSizes.length ? `
         <div class="product-info__options">
           <span class="option-label">${product.optionLabel || (product.category === 'chaussures' ? 'Pointure' : 'Taille')} :</span>
@@ -825,6 +835,7 @@ function setupProductPage() {
   `;
 
   const mainImg = document.getElementById('mainImg');
+  const requestedShoeColor = document.getElementById('requestedShoeColor');
   if (isJerseyCatalog) {
     const teamSelect = document.getElementById('jerseyTeamSelect');
     const typeSelect = document.getElementById('jerseyTypeSelect');
@@ -973,7 +984,7 @@ function setupProductPage() {
       cartProduct,
       qty,
       selectedSize,
-      selectedColor?.name || null,
+      requestedShoeColor?.value.trim() || selectedColor?.name || null,
       product.optionLabel || (product.category === 'chaussures' ? 'Pointure' : 'Taille')
     );
     if (!added) return;
@@ -1207,10 +1218,10 @@ function setupCheckoutForm() {
     }
 
     if (savedOrder) {
-      if (hint) hint.textContent = `Commande ${orderReference} enregistrée. WhatsApp va s’ouvrir pour confirmer l’envoi.`;
+      if (hint) hint.textContent = `Commande ${orderReference} enregistrée. Ouverture WhatsApp…`;
       showToast(`Commande ${orderReference} enregistrée ✅`);
     } else {
-      const message = 'Supabase est indisponible : la commande part sur WhatsApp sans être enregistrée.';
+      const message = 'Envoi WhatsApp. Commande non enregistrée.';
       if (hint) hint.textContent = message;
       showToast(message);
     }
