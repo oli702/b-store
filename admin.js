@@ -4,9 +4,16 @@ const loginPanel = document.getElementById('adminLoginPanel');
 const dashboard = document.getElementById('adminDashboard');
 const productForm = document.getElementById('productForm');
 const inventoryList = document.getElementById('inventoryList');
-const client = window.supabase && config.url && config.anonKey
-  ? window.supabase.createClient(config.url, config.anonKey)
-  : null;
+let client = null;
+let clientInitializationError = '';
+
+if (window.supabase?.createClient && config.url && config.anonKey) {
+  try {
+    client = window.supabase.createClient(config.url, config.anonKey);
+  } catch (error) {
+    clientInitializationError = error.message || 'Configuration Supabase invalide.';
+  }
+}
 
 let products = [];
 let orders = [];
@@ -207,7 +214,7 @@ document.getElementById('adminLoginForm').addEventListener('submit', async (even
   const form = event.currentTarget;
   const button = form.querySelector('[type="submit"]');
   if (!client) {
-    showStatus('Supabase n’est pas configuré. Renseigne supabase-config.js avec l’URL du projet et la clé publishable.', 'error');
+    showStatus(clientInitializationError || 'Supabase n’est pas configuré. Vérifie supabase-config.js, l’URL du projet et la clé publishable.', 'error');
     return;
   }
   button.disabled = true;
@@ -367,7 +374,7 @@ document.getElementById('ordersList').addEventListener('click', async (event) =>
 
 async function initializeAdmin() {
   if (!client) {
-    showStatus('Supabase n’est pas configuré. Renseigne supabase-config.js avec l’URL du projet et la clé publishable.', 'error');
+    showStatus(clientInitializationError || 'Supabase n’est pas configuré. Vérifie supabase-config.js, l’URL du projet et la clé publishable.', 'error');
     return;
   }
   try {
