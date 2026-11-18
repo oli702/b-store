@@ -310,24 +310,30 @@ document.querySelectorAll('[data-admin-view]').forEach((button) => {
 });
 
 ['orderSearch', 'paymentFilter', 'deliveryFilter'].forEach((id) => {
-  document.getElementById(id).addEventListener('input', renderOrders);
-  document.getElementById(id).addEventListener('change', renderOrders);
+  const filter = document.getElementById(id);
+  if (!filter) return;
+  filter.addEventListener('input', renderOrders);
+  filter.addEventListener('change', renderOrders);
 });
 
-document.getElementById('refreshOrders').addEventListener('click', async (event) => {
-  const button = event.currentTarget;
-  button.disabled = true;
-  try {
-    await loadOrders();
-    showStatus('Commandes actualisées.');
-  } catch (error) {
-    showStatus(error.message || 'Impossible d’actualiser les commandes.', 'error');
-  } finally {
-    button.disabled = false;
-  }
-});
+const refreshOrdersButton = document.getElementById('refreshOrders');
+if (refreshOrdersButton) {
+  refreshOrdersButton.addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      await loadOrders();
+      showStatus('Commandes actualisées.');
+    } catch (error) {
+      showStatus(error.message || 'Impossible d’actualiser les commandes.', 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
 
-document.getElementById('exportOrders').addEventListener('click', () => {
+const exportOrdersButton = document.getElementById('exportOrders');
+if (exportOrdersButton) exportOrdersButton.addEventListener('click', () => {
   if (!ordersLoaded) {
     showStatus('Charge les commandes avant de les exporter.', 'error');
     return;
@@ -339,7 +345,8 @@ document.getElementById('exportOrders').addEventListener('click', () => {
   exportOrdersCsv();
 });
 
-document.getElementById('ordersList').addEventListener('click', async (event) => {
+const ordersList = document.getElementById('ordersList');
+if (ordersList) ordersList.addEventListener('click', async (event) => {
   const button = event.target.closest('[data-save-order]');
   if (!button) return;
   const card = button.closest('[data-order-id]');
