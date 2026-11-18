@@ -51,19 +51,38 @@
             <input type="email" id="email" name="email" placeholder="vous@exemple.com">
           </div>
 
-          <h3>2. Livraison</h3>
-          <div class="form-group">
-            <label for="adresse">Adresse de livraison *</label>
-            <input type="text" id="adresse" name="adresse" required placeholder="Quartier, rue, point de repère">
+          <h3>2. Mode de remise</h3>
+          <div class="payments fulfillment-options" role="radiogroup" aria-label="Mode de remise">
+            <label class="payment-option">
+              <input type="radio" name="fulfillment_method" value="delivery" checked>
+              <span class="payment-option__body">
+                <span class="payment-option__logo" style="background:#245c45;color:white;">↗</span>
+                <span><strong>Livraison</strong><br><small>À l’adresse de votre choix · 2 000 FCFA</small></span>
+              </span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="fulfillment_method" value="pickup">
+              <span class="payment-option__body">
+                <span class="payment-option__logo" style="background:#c99a51;color:white;">⌖</span>
+                <span><strong>Retrait sur place</strong><br><small>À Saaba · gratuit</small></span>
+              </span>
+            </label>
           </div>
-          <div class="form-row">
+
+          <div id="deliveryFields">
             <div class="form-group">
-              <label for="ville">Ville *</label>
-              <input type="text" id="ville" name="ville" required placeholder="Ouagadougou">
+              <label for="adresse">Adresse de livraison *</label>
+              <input type="text" id="adresse" name="adresse" required placeholder="Quartier, rue, point de repère">
             </div>
-            <div class="form-group">
-              <label for="pays">Pays *</label>
-              <input type="text" id="pays" name="pays" required value="Burkina Faso">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ville">Ville *</label>
+                <input type="text" id="ville" name="ville" required placeholder="Ouagadougou">
+              </div>
+              <div class="form-group">
+                <label for="pays">Pays *</label>
+                <input type="text" id="pays" name="pays" required value="Burkina Faso">
+              </div>
             </div>
           </div>
 
@@ -101,7 +120,7 @@
 
           <div class="checkout__actions">
             <button type="submit" class="btn btn--primary" style="width:100%;">✅ Confirmer via WhatsApp</button>
-            <p class="checkout__hint">Votre commande sera envoyée sur WhatsApp pour confirmation et paiement.</p>
+            <p class="checkout__hint" id="checkoutHint" role="status">Votre commande sera enregistrée puis envoyée sur WhatsApp pour confirmation.</p>
           </div>
         </form>
 
@@ -144,6 +163,8 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

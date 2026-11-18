@@ -10,6 +10,8 @@ const client = window.supabase && config.url && config.anonKey
   : null;
 
 let products = [];
+let orders = [];
+let ordersLoaded = false;
 
 function showStatus(message, kind = 'success') {
   statusElement.textContent = message;
@@ -53,7 +55,12 @@ function setBusy(form, busy) {
 function setAuthenticated(user) {
   loginPanel.hidden = Boolean(user);
   dashboard.hidden = !user;
-  document.getElementById('adminIdentity').textContent = user ? user.email : '';
+  document.getElementById('adminIdentity').textContent = user ? 'Session administrateur active' : '';
+  if (!user) {
+    orders = [];
+    ordersLoaded = false;
+    document.getElementById('ordersList').innerHTML = '<p class="inventory-empty">Ouvre l’onglet pour charger les commandes.</p>';
+  }
 }
 
 async function verifyAdmin(user) {
@@ -103,6 +110,261 @@ async function loadInventory() {
   products = data || [];
   renderInventory();
 }
+
+const paymentStatusLabels = {
+  pending: 'En attente',
+  paid: 'Payé',
+  failed: 'Échoué',
+  refunded: 'Remboursé'
+};
+const deliveryStatusLabels = {
+  new: 'Nouvelle',
+  confirmed: 'Confirmée',
+  shipping: 'En livraison',
+  delivered: 'Livrée',
+  canceled: 'Annulée'
+};
+const paymentMethodLabels = {
+  wave: 'Wave',
+  orange: 'Orange Money',
+  mtn: 'MTN MoMo',
+  cash: 'Paiement à la livraison'
+};
+const fulfillmentMethodLabels = {
+  delivery: 'Livraison',
+  pickup: 'Retrait à Saaba'
+};
+
+function renderOrderCard(order) {
+  const phoneDigits = String(order.customer_phone || '').replace(/\D/g, '');
+  const items = Array.isArray(order.items) ? order.items : [];
+  const itemSummary = items.map((item) => {
+    const options = [
+      item.color ? `Coloris : ${item.color}` : '',
+      item.size ? `${item.sizeLabel || 'Taille'} : ${item.size}` : ''
+    ].filter(Boolean);
+    return `<li>${escapeHtml(item.name)} × ${Number(item.qty) || 0}${options.length ? ` <span>(${escapeHtml(options.join(', '))})</span>` : ''}</li>`;
+  }).join('');
+
+  return `
+    <article class="order-card" data-order-id="${escapeHtml(order.id)}">
+      <header class="order-card__header">
+        <div>
+          <strong class="order-reference">${escapeHtml(order.order_ref)}</strong>
+          <span class="order-date">${escapeHtml(new Date(order.created_at).toLocaleString('fr-FR'))}</span>
+        </div>
+        <strong class="order-total">${formatPrice(order.total)}</strong>
+      </header>
+      <div class="order-card__customer">
+        <strong>${escapeHtml(order.customer_name)}</strong>
+        <span>${escapeHtml(order.customer_phone)} · ${escapeHtml(paymentMethodLabels[order.payment_method] || order.payment_method)}</span>
+        ${order.customer_email ? `<span>${escapeHtml(order.customer_email)}</span>` : ''}
+        <span>${order.fulfillment_method === 'pickup'
+    ? 'Retrait sur place à Saaba'
+    : `${escapeHtml(order.delivery_address)}, ${escapeHtml(order.delivery_city)}, ${escapeHtml(order.delivery_country)}`}</span>
+      </div>
+      <ul class="order-card__items">${itemSummary}</ul>
+      ${order.notes ? `<p class="order-notes"><strong>Note :</strong> ${escapeHtml(order.notes)}</p>` : ''}
+      <div class="order-card__tracking">
+        <label>
+          <span>Paiement</span>
+          <select data-field="payment_status">
+            ${Object.entries(paymentStatusLabels).map(([value, label]) => `<option value="${value}" ${order.payment_status === value ? 'selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </label>
+        <label>
+          <span>Livraison</span>
+          <select data-field="delivery_status">
+            ${Object.entries(deliveryStatusLabels).map(([value, label]) => `<option value="${value}" ${order.delivery_status === value ? 'selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </label>
+        <label class="transaction-reference">
+          <span>Référence transaction</span>
+          <input data-field="transaction_reference" type="text" maxlength="160" value="${escapeHtml(order.transaction_reference || '')}" placeholder="Wave / Orange Money">
+        </label>
+      </div>
+      <footer class="order-card__footer">
+        <div class="order-card__contact">
+          ${phoneDigits ? `<a class="admin-button admin-button--secondary" href="https://wa.me/${encodeURIComponent(phoneDigits)}" target="_blank" rel="noopener noreferrer">WhatsApp</a><a class="admin-button admin-button--secondary" href="tel:${phoneDigits}">Appeler</a>` : ''}
+        </div>
+        <button class="admin-button" type="button" data-save-order>Enregistrer le suivi</button>
+      </footer>
+    </article>
+  `;
+}
+
+function getFilteredOrders() {
+  const query = document.getElementById('orderSearch').value.trim().toLocaleLowerCase('fr');
+  const paymentStatus = document.getElementById('paymentFilter').value;
+  const deliveryStatus = document.getElementById('deliveryFilter').value;
+  return orders.filter((order) => {
+    const matchesQuery = !query || [order.order_ref, order.customer_name, order.customer_phone]
+      .some((value) => String(value || '').toLocaleLowerCase('fr').includes(query));
+    return matchesQuery
+      && (!paymentStatus || order.payment_status === paymentStatus)
+      && (!deliveryStatus || order.delivery_status === deliveryStatus);
+  });
+}
+
+function renderOrders() {
+  document.getElementById('newOrderCount').textContent = String(orders.filter((order) => order.delivery_status === 'new').length);
+  document.getElementById('collectedAmount').textContent = formatPrice(
+    orders.filter((order) => order.payment_status === 'paid').reduce((total, order) => total + Number(order.total || 0), 0)
+  );
+  document.getElementById('outstandingAmount').textContent = formatPrice(
+    orders.filter((order) => ['pending', 'failed'].includes(order.payment_status))
+      .reduce((total, order) => total + Number(order.total || 0), 0)
+  );
+
+  const filteredOrders = getFilteredOrders();
+  document.getElementById('ordersCount').textContent = `${filteredOrders.length} commande${filteredOrders.length > 1 ? 's' : ''}`;
+  document.getElementById('ordersList').innerHTML = filteredOrders.length
+    ? filteredOrders.map(renderOrderCard).join('')
+    : '<p class="inventory-empty">Aucune commande ne correspond à ces critères.</p>';
+}
+
+async function loadOrders() {
+  const ordersList = document.getElementById('ordersList');
+  ordersList.innerHTML = '<p class="inventory-empty">Chargement des commandes…</p>';
+  orders = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await client
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + 999);
+    if (error) throw error;
+    orders.push(...(data || []));
+    if (!data || data.length < 1000) break;
+  }
+  ordersLoaded = true;
+  renderOrders();
+}
+
+function exportOrdersCsv() {
+  const columns = [
+    ['Référence', 'order_ref'],
+    ['Date', 'created_at'],
+    ['Nom', 'customer_name'],
+    ['Téléphone', 'customer_phone'],
+    ['Email', 'customer_email'],
+    ['Adresse', 'delivery_address'],
+    ['Ville', 'delivery_city'],
+    ['Pays', 'delivery_country'],
+    ['Mode de remise', 'fulfillment_method'],
+    ['Articles', 'items'],
+    ['Sous-total', 'subtotal'],
+    ['Livraison', 'shipping_fee'],
+    ['Total', 'total'],
+    ['Mode de paiement', 'payment_method'],
+    ['Statut paiement', 'payment_status'],
+    ['Statut livraison', 'delivery_status'],
+    ['Référence transaction', 'transaction_reference'],
+    ['Notes', 'notes']
+  ];
+  const csvValue = (value) => {
+    const text = String(value ?? '');
+    const safeText = /^\s*[=+\-@]/.test(text) ? `'${text}` : text;
+    return `"${safeText.replace(/"/g, '""')}"`;
+  };
+  const rows = orders.map((order) => columns.map(([, key]) => {
+    if (key === 'items') {
+      return csvValue((order.items || []).map((item) => `${item.name} × ${item.qty}`).join('; '));
+    }
+    if (key === 'payment_method') return csvValue(paymentMethodLabels[order[key]] || order[key]);
+    if (key === 'fulfillment_method') return csvValue(fulfillmentMethodLabels[order[key]] || order[key]);
+    if (key === 'payment_status') return csvValue(paymentStatusLabels[order[key]] || order[key]);
+    if (key === 'delivery_status') return csvValue(deliveryStatusLabels[order[key]] || order[key]);
+    return csvValue(order[key]);
+  }).join(','));
+  const csv = `\uFEFF${columns.map(([label]) => csvValue(label)).join(',')}\r\n${rows.join('\r\n')}`;
+  const blobUrl = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = `bstore-commandes-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
+}
+
+document.querySelectorAll('[data-admin-view]').forEach((button) => {
+  button.addEventListener('click', async () => {
+    const ordersViewSelected = button.dataset.adminView === 'orders';
+    document.getElementById('inventoryView').hidden = ordersViewSelected;
+    document.getElementById('ordersView').hidden = !ordersViewSelected;
+    document.querySelectorAll('[data-admin-view]').forEach((tab) => {
+      const active = tab === button;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-pressed', String(active));
+    });
+
+    if (ordersViewSelected) {
+      try {
+        await loadOrders();
+      } catch (error) {
+        ordersLoaded = false;
+        document.getElementById('ordersList').innerHTML = '<p class="inventory-empty">Impossible de charger les commandes. Vérifie la configuration SQL et réessaie.</p>';
+        showStatus(error.message || 'Impossible de charger les commandes.', 'error');
+      }
+    }
+  });
+});
+
+['orderSearch', 'paymentFilter', 'deliveryFilter'].forEach((id) => {
+  document.getElementById(id).addEventListener('input', renderOrders);
+  document.getElementById(id).addEventListener('change', renderOrders);
+});
+
+document.getElementById('refreshOrders').addEventListener('click', async (event) => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try {
+    await loadOrders();
+    showStatus('Commandes actualisées.');
+  } catch (error) {
+    showStatus(error.message || 'Impossible d’actualiser les commandes.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
+
+document.getElementById('exportOrders').addEventListener('click', () => {
+  if (!ordersLoaded) {
+    showStatus('Charge les commandes avant de les exporter.', 'error');
+    return;
+  }
+  if (!orders.length) {
+    showStatus('Aucune commande à exporter.', 'error');
+    return;
+  }
+  exportOrdersCsv();
+});
+
+document.getElementById('ordersList').addEventListener('click', async (event) => {
+  const button = event.target.closest('[data-save-order]');
+  if (!button) return;
+  const card = button.closest('[data-order-id]');
+  if (!card) return;
+  button.disabled = true;
+
+  try {
+    const id = card.dataset.orderId;
+    const { error } = await client
+      .from('orders')
+      .update({
+        payment_status: card.querySelector('[data-field="payment_status"]').value,
+        delivery_status: card.querySelector('[data-field="delivery_status"]').value,
+        transaction_reference: card.querySelector('[data-field="transaction_reference"]').value.trim()
+      })
+      .eq('id', id);
+    if (error) throw error;
+    await loadOrders();
+    showStatus(`Suivi de la commande ${card.querySelector('.order-reference').textContent} enregistré.`);
+  } catch (error) {
+    showStatus(error.message || 'Impossible d’enregistrer le suivi de la commande.', 'error');
+  } finally {
+    button.disabled = false;
+  }
+});
 
 function resetProductForm() {
   productForm.reset();

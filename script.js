@@ -152,7 +152,7 @@ const CATALOG = {
       'https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw23ce58ab/nk/85d/c/9/6/b/6/85dc96b6_1cef_43ec_8cef_40e3938ac7cf.jpg'
     ],
     desc: 'Sneakers Nike dans un coloris noir, blanc et rouge. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44','45'],
     colors: [
       { name: 'Noir / blanc / rouge', hex: '#292929', img: 'https://www.nike.ae/dw/image/v2/BDVB_PRD/on/demandware.static/-/Sites-akeneo-master-catalog/default/dw23ce58ab/nk/85d/c/9/6/b/6/85dc96b6_1cef_43ec_8cef_40e3938ac7cf.jpg' }
     ],
@@ -171,7 +171,7 @@ const CATALOG = {
       'https://tse4.mm.bing.net/th/id/OIP.UFTE8fWgxspecNigUMKzwgHaEo?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'
     ],
     desc: 'Nike Air Max Plus (TN), disponible dans deux coloris. Choisissez le coloris et la pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       {
         name: 'Autre coloris',
@@ -184,7 +184,7 @@ const CATALOG = {
         img: 'https://cms-cdn.thesolesupplier.co.uk/2023/05/a-cold-wall-x-nike-tn-air-max-plus-black-fd7855-001.jpeg'
       }
     ],
-    features: ['Prix unitaire : 20 000 FCFA', 'Pointures 39 à 44', 'Deux coloris au choix']
+    features: ['Prix unitaire : 20 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
   p10: {
     id: 'p10',
@@ -221,12 +221,12 @@ const CATALOG = {
       'assets/sneakers-model-11-color-2.jpg'
     ],
     desc: 'New Balance 530 proposée en blanc et en rose poudré. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Blanc / gris', hex: '#e8e8e4', img: 'assets/sneakers-model-11-color-1.jpg' },
       { name: 'Rose poudré', hex: '#e8cdd0', img: 'assets/sneakers-model-11-color-2.jpg' }
     ],
-    features: ['Prix unitaire : 17 000 FCFA', 'Pointures 39 à 44', 'Deux coloris au choix']
+    features: ['Prix unitaire : 17 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
   p12: {
     id: 'p12',
@@ -242,12 +242,12 @@ const CATALOG = {
       'assets/sneakers-model-12-color-2.jpg'
     ],
     desc: 'New Balance 9060 proposée en beige et en bleu marine. Choisissez votre coloris et votre pointure avant de l’ajouter au panier.',
-    sizes: ['39', '40', '41', '42', '43', '44'],
+    sizes: ['39', '40', '41', '42', '43', '44', '45'],
     colors: [
       { name: 'Beige', hex: '#d8ccad', img: 'assets/sneakers-model-12-color-1.jpg' },
       { name: 'Bleu marine', hex: '#243a57', img: 'assets/sneakers-model-12-color-2.jpg' }
     ],
-    features: ['Prix unitaire : 19 000 FCFA', 'Pointures 39 à 44', 'Deux coloris au choix']
+    features: ['Prix unitaire : 19 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
   p13: {
     id: 'p13',
@@ -338,6 +338,7 @@ function renderManagedProductCard(product) {
 let managedCatalogLoadError = false;
 
 async function loadManagedProducts() {
+  if (!document.getElementById('productsGrid') && !document.getElementById('productDetail')) return;
   const config = window.BSTORE_SUPABASE_CONFIG;
   const supabase = window.supabase;
   if (!config?.url && !config?.anonKey) return;
@@ -528,6 +529,8 @@ function renderCheckout() {
   if (!container) return;
 
   const items = Cart.load();
+  const fulfillmentMethod = document.querySelector('input[name="fulfillment_method"]:checked')?.value || 'delivery';
+  const shippingFee = fulfillmentMethod === 'pickup' ? 0 : SHIPPING_FEE;
 
   if (items.length === 0) {
     container.innerHTML = '<p style="color:#888;text-align:center;padding:20px 0;">Votre panier est vide.</p>';
@@ -535,7 +538,7 @@ function renderCheckout() {
     const shippingEl = document.getElementById('sumShipping');
     const totalEl = document.getElementById('sumTotal');
     if (subtotalEl) subtotalEl.textContent = '0 FCFA';
-    if (shippingEl) shippingEl.textContent = '0 FCFA';
+    if (shippingEl) shippingEl.textContent = formatPrice(shippingFee);
     if (totalEl) totalEl.textContent = '0 FCFA';
     return;
   }
@@ -558,8 +561,8 @@ function renderCheckout() {
   const totalEl = document.getElementById('sumTotal');
 
   if (subtotalEl) subtotalEl.textContent = formatPrice(Cart.subtotal());
-  if (shippingEl) shippingEl.textContent = formatPrice(SHIPPING_FEE);
-  if (totalEl) totalEl.textContent = formatPrice(Cart.total());
+  if (shippingEl) shippingEl.textContent = formatPrice(shippingFee);
+  if (totalEl) totalEl.textContent = formatPrice(Cart.subtotal() + shippingFee);
 }
 
 function setupCartModal() {
@@ -1032,7 +1035,40 @@ function setupCheckoutForm() {
     showToast('Votre panier est vide. Ajoutez des produits d\'abord.');
   }
 
-  form.addEventListener('submit', (event) => {
+  const submissionStorageKey = 'b-store_checkout_submission_id';
+  const fulfillmentInputs = form.querySelectorAll('input[name="fulfillment_method"]');
+  const deliveryFields = document.getElementById('deliveryFields');
+  const addressFields = ['adresse', 'ville', 'pays'].map((id) => document.getElementById(id));
+  const updateFulfillmentFields = () => {
+    const isDelivery = form.querySelector('input[name="fulfillment_method"]:checked')?.value !== 'pickup';
+    if (deliveryFields) deliveryFields.hidden = !isDelivery;
+    addressFields.forEach((field) => {
+      if (field) {
+        field.required = isDelivery;
+        field.disabled = !isDelivery;
+      }
+    });
+    Cart.updateUI();
+  };
+  fulfillmentInputs.forEach((input) => input.addEventListener('change', updateFulfillmentFields));
+  updateFulfillmentFields();
+
+  form.addEventListener('input', () => {
+    try {
+      sessionStorage.removeItem(submissionStorageKey);
+    } catch (error) {
+      console.warn('Impossible de réinitialiser la référence de soumission :', error);
+    }
+  });
+  form.addEventListener('change', () => {
+    try {
+      sessionStorage.removeItem(submissionStorageKey);
+    } catch (error) {
+      console.warn('Impossible de réinitialiser la référence de soumission :', error);
+    }
+  });
+
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const items = Cart.load();
@@ -1041,6 +1077,11 @@ function setupCheckoutForm() {
       return;
     }
 
+    const submitButton = form.querySelector('button[type="submit"]');
+    const hint = document.getElementById('checkoutHint');
+    if (submitButton?.disabled) return;
+    if (submitButton) submitButton.disabled = true;
+
     const data = {
       nom: document.getElementById('nom').value.trim(),
       tel: document.getElementById('tel').value.trim(),
@@ -1048,9 +1089,73 @@ function setupCheckoutForm() {
       adresse: document.getElementById('adresse').value.trim(),
       ville: document.getElementById('ville').value.trim(),
       pays: document.getElementById('pays').value.trim(),
+      modeRemise: form.querySelector('input[name="fulfillment_method"]:checked')?.value || 'delivery',
       paiement: document.querySelector('input[name="paiement"]:checked')?.value || 'wave',
       notes: document.getElementById('notes').value.trim()
     };
+    const shippingFee = data.modeRemise === 'pickup' ? 0 : SHIPPING_FEE;
+
+    let submissionId;
+    try {
+      submissionId = sessionStorage.getItem(submissionStorageKey);
+      if (!submissionId) {
+        submissionId = crypto.randomUUID();
+        sessionStorage.setItem(submissionStorageKey, submissionId);
+      }
+    } catch (error) {
+      console.warn('La protection anti-doublon temporaire est indisponible :', error);
+      submissionId = crypto.randomUUID();
+    }
+
+    const whatsappWindow = window.open('about:blank', '_blank');
+    let orderReference = '';
+    let savedOrder = false;
+    const config = window.BSTORE_SUPABASE_CONFIG;
+
+    if (config?.url && config?.anonKey && window.supabase?.createClient) {
+      try {
+        const client = window.supabase.createClient(config.url, config.anonKey);
+        const { data: savedOrders, error } = await client.rpc('create_store_order', {
+          p_order: {
+            submission_id: submissionId,
+            customer_name: data.nom,
+            customer_phone: data.tel,
+            customer_email: data.email,
+            fulfillment_method: data.modeRemise,
+            delivery_address: data.modeRemise === 'delivery' ? data.adresse : null,
+            delivery_city: data.modeRemise === 'delivery' ? data.ville : null,
+            delivery_country: data.modeRemise === 'delivery' ? data.pays : null,
+            payment_method: data.paiement,
+            notes: data.notes,
+            items: items.map((item) => ({
+              name: item.name,
+              price: Math.round(Number(item.price) || 0),
+              qty: Math.max(1, Math.round(Number(item.qty) || 1)),
+              size: item.size || '',
+              sizeLabel: item.sizeLabel || '',
+              color: item.color || ''
+            }))
+          }
+        });
+        if (error) throw error;
+        orderReference = savedOrders?.[0]?.order_ref;
+        if (!orderReference) throw new Error('Supabase n’a pas retourné la référence de la commande.');
+
+        savedOrder = true;
+        try {
+          Cart.clear();
+        } catch (storageError) {
+          console.error('Commande enregistrée, mais le panier local n’a pas pu être vidé :', storageError);
+        }
+        try {
+          sessionStorage.removeItem(submissionStorageKey);
+        } catch (storageError) {
+          console.warn('Impossible de supprimer la référence de soumission :', storageError);
+        }
+      } catch (error) {
+        console.error('La commande n’a pas pu être confirmée dans Supabase :', error);
+      }
+    }
 
     const paiementLabels = {
       wave: 'Wave',
@@ -1064,8 +1169,10 @@ function setupCheckoutForm() {
     msg += `Nom : ${data.nom}\n`;
     msg += `Téléphone : ${data.tel}\n`;
     if (data.email) msg += `Email : ${data.email}\n`;
-    msg += '\n*📍 Livraison*\n';
-    msg += `${data.adresse}\n${data.ville}, ${data.pays}\n`;
+    msg += data.modeRemise === 'pickup' ? '\n*📍 Retrait sur place*\n' : '\n*📍 Livraison*\n';
+    msg += data.modeRemise === 'pickup'
+      ? 'Retrait à Saaba\n'
+      : `${data.adresse}\n${data.ville}, ${data.pays}\n`;
     msg += '\n*🛍️ Produits*\n';
 
     items.forEach((item) => {
@@ -1077,17 +1184,37 @@ function setupCheckoutForm() {
     });
 
     msg += '\n*💰 Récapitulatif*\n';
-    msg += `Sous-total : ${formatPrice(Cart.subtotal())}\n`;
-    msg += `Livraison : ${formatPrice(SHIPPING_FEE)}\n`;
-    msg += `*TOTAL : ${formatPrice(Cart.total())}*\n`;
+    const subtotal = items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 0), 0);
+    msg += `Sous-total : ${formatPrice(subtotal)}\n`;
+    msg += `${data.modeRemise === 'pickup' ? 'Retrait' : 'Livraison'} : ${formatPrice(shippingFee)}\n`;
+    msg += `*TOTAL : ${formatPrice(subtotal + shippingFee)}*\n`;
     msg += `\n*💳 Paiement* : ${paiementLabels[data.paiement] || 'Wave'}\n`;
+    if (orderReference) msg += `\n*Référence commande* : ${orderReference}\n`;
     if (data.notes) msg += `\n*📝 Notes*\n${data.notes}\n`;
     msg += '\nMerci de confirmer ma commande 🙏';
 
     const WHATSAPP_NUMBER = '22670895871';
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
-    showToast('Commande envoyée sur WhatsApp ✅');
+    try {
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.location.href = url;
+      } else {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Impossible d’ouvrir WhatsApp dans un nouvel onglet :', error);
+      window.location.href = url;
+    }
+
+    if (savedOrder) {
+      if (hint) hint.textContent = `Commande ${orderReference} enregistrée. WhatsApp va s’ouvrir pour confirmer l’envoi.`;
+      showToast(`Commande ${orderReference} enregistrée ✅`);
+    } else {
+      const message = 'Supabase est indisponible : la commande part sur WhatsApp sans être enregistrée.';
+      if (hint) hint.textContent = message;
+      showToast(message);
+    }
+    if (submitButton) submitButton.disabled = false;
   });
 }
 
