@@ -75,20 +75,6 @@ const CATALOG = {
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     features: ['Modèle simple : 5 000 FCFA', 'Modèle pro : 10 000 FCFA', 'Équipe et disponibilité à confirmer']
   },
-  p3: {
-    id: 'p3',
-    name: 'iPhone 14 Pro 256 Go',
-    price: 285000,
-    oldPrice: null,
-    cat: 'Téléphones',
-    category: 'telephones',
-    optionLabel: 'Capacité de stockage',
-    img: IPHONE_IMAGE,
-    gallery: [IPHONE_IMAGE],
-    desc: 'iPhone 14 Pro avec 256 Go de stockage. Visuel illustratif ; coloris, état et disponibilité à confirmer auprès de B-STORE.',
-    sizes: ['256 Go'],
-    features: ['Prix communiqué : 285 000 FCFA', 'Stockage : 256 Go', 'Coloris, état et disponibilité à confirmer avant commande']
-  },
   p4: {
     id: 'p4',
     name: 'Sneakers streetwear',
@@ -270,21 +256,10 @@ const CATALOG = {
     ],
     features: ['Prix unitaire : 18 000 FCFA', 'Pointures 39 à 45', 'Deux coloris au choix']
   },
-  p14: createIPhoneProduct('p14', 'iPhone 11', 125000),
-  p15: createIPhoneProduct('p15', 'iPhone 12 128 Go', 140000, '128 Go'),
-  p16: createIPhoneProduct('p16', 'iPhone 12 Pro 128 Go', 170000, '128 Go'),
-  p17: createIPhoneProduct('p17', 'iPhone 12 Pro 256 Go', 190000, '256 Go'),
-  p18: createIPhoneProduct('p18', 'iPhone 13 128 Go', 175000, '128 Go'),
-  p19: createIPhoneProduct('p19', 'iPhone 13 256 Go', 195000, '256 Go'),
-  p20: createIPhoneProduct('p20', 'iPhone 13 Pro 128 Go', 230000, '128 Go'),
-  p21: createIPhoneProduct('p21', 'iPhone 13 Pro 256 Go', 245000, '256 Go'),
-  p22: createIPhoneProduct('p22', 'iPhone 15 Pro 256 Go', 350000, '256 Go'),
-  p23: createIPhoneProduct('p23', 'iPhone 16 128 Go', 350000, '128 Go'),
-  p24: createIPhoneProduct('p24', 'iPhone 15 Pro Max', 390000),
-  p25: createIPhoneProduct('p25', 'iPhone 14 Pro Max', 335000),
-  p26: createIPhoneProduct('p26', 'iPhone 16 Pro 256 Go', 445000, '256 Go'),
-  p27: createIPhoneProduct('p27', 'iPhone 16 Pro Max', 485000),
-  p28: createIPhoneProduct('p28', 'iPhone 18 Pro Max', 1150000)
+  ...Object.fromEntries((window.BSTORE_PHONE_CATALOG || []).map(({ id, name, price, storage }) => [
+    id,
+    createIPhoneProduct(id, name, price, storage || null)
+  ]))
 };
 
 function mapManagedProduct(row) {
@@ -338,6 +313,94 @@ function renderManagedProductCard(product) {
 }
 
 let managedCatalogLoadError = false;
+const inactiveLegacyProducts = new Set();
+
+function applyLegacyProductOverrides(rows) {
+  const categoryLabels = {
+    chaussures: 'Chaussures',
+    maillots: 'Maillots',
+    telephones: 'Téléphones',
+    electronique: 'Ordinateurs & PlayStation'
+  };
+  const cards = Array.from(document.querySelectorAll('#productsGrid > .product-card[data-id]'));
+
+  rows.forEach((row) => {
+    const productId = String(row.product_id);
+    const active = Boolean(row.active);
+    if (active) inactiveLegacyProducts.delete(productId);
+    else inactiveLegacyProducts.add(productId);
+
+    const imageUrl = new URL(row.image_url, window.location.href);
+    if (!['http:', 'https:'].includes(imageUrl.protocol)) {
+      throw new Error(`L’image du produit « ${row.name} » doit utiliser une adresse HTTP ou HTTPS.`);
+    }
+
+    const product = CATALOG[productId];
+    if (product) {
+      product.name = row.name;
+      product.price = Number(row.price);
+      product.category = row.category;
+      product.cat = categoryLabels[row.category];
+      product.img = imageUrl.href;
+      product.gallery = [imageUrl.href];
+      product.features = product.features.map((feature) => {
+        if (feature.startsWith('Prix unitaire :')) return `Prix unitaire : ${formatPrice(row.price)}`;
+        if (feature.startsWith('Prix communiqué :')) return `Prix communiqué : ${formatPrice(row.price)}`;
+        if (feature.startsWith('Modèle simple :')) return `Modèle simple : ${formatPrice(row.price)}`;
+        return feature;
+      });
+    }
+
+    cards.filter((card) => card.dataset.id === productId).forEach((card) => {
+      card.hidden = !active;
+      card.dataset.cat = row.category;
+      card.dataset.name = row.name;
+      card.dataset.price = String(row.price);
+      card.dataset.img = imageUrl.href;
+      const titleLink = card.querySelector('h3 a');
+      if (titleLink) {
+        titleLink.textContent = row.name;
+        titleLink.href = `produit.html?id=${encodeURIComponent(productId)}`;
+      }
+      const category = card.querySelector('.product-card__cat');
+      if (category) category.textContent = categoryLabels[row.category];
+      const image = card.querySelector('.product-card__img img');
+      if (image) {
+        image.src = imageUrl.href;
+        image.alt = row.name;
+      }
+      const price = card.querySelector('.product-card__price strong');
+      if (price) price.textContent = Number(row.price) > 0 ? formatPrice(row.price) : 'Prix sur demande';
+      card.querySelectorAll('a[href*="produit.html?id="]').forEach((link) => {
+        link.href = `produit.html?id=${encodeURIComponent(productId)}`;
+      });
+    });
+  });
+
+  const phoneCatalog = window.BSTORE_PHONE_CATALOG || [];
+  const availablePhones = phoneCatalog.filter((phone) => !inactiveLegacyProducts.has(phone.id));
+  const phoneCard = cards.find((card) => card.dataset.id === 'iphone-catalog');
+  if (phoneCard) {
+    phoneCard.hidden = availablePhones.length === 0;
+    if (availablePhones.length) {
+      inactiveLegacyProducts.delete('iphone-catalog');
+      const startingPhone = availablePhones.reduce((cheapest, phone) => (
+        Number(CATALOG[phone.id]?.price ?? phone.price) < Number(CATALOG[cheapest.id]?.price ?? cheapest.price)
+          ? phone
+          : cheapest
+      ));
+      const startingPrice = Number(CATALOG[startingPhone.id]?.price ?? startingPhone.price);
+      phoneCard.dataset.price = String(startingPrice);
+      phoneCard.dataset.img = CATALOG[startingPhone.id]?.img || window.BSTORE_PHONE_CATALOG_IMAGE;
+      const price = phoneCard.querySelector('.product-card__price strong');
+      if (price) price.textContent = `À partir de ${formatPrice(startingPrice)}`;
+      const image = phoneCard.querySelector('.product-card__img img');
+      if (image) image.src = phoneCard.dataset.img;
+    } else {
+      inactiveLegacyProducts.add('iphone-catalog');
+    }
+  }
+}
 
 async function loadManagedProducts() {
   if (!document.getElementById('productsGrid') && !document.getElementById('productDetail')) return;
@@ -367,6 +430,21 @@ async function loadManagedProducts() {
       CATALOG[product.id] = product;
       if (grid) grid.insertAdjacentHTML('beforeend', renderManagedProductCard(product));
     });
+
+    try {
+      const { data: overrides, error: overridesError } = await client
+        .from('product_overrides')
+        .select('product_id, name, category, price, image_url, active');
+      if (overridesError) throw overridesError;
+      applyLegacyProductOverrides(overrides || []);
+    } catch (error) {
+      console.error('Impossible de charger les modifications du catalogue initial :', error);
+      const status = document.getElementById('managedCatalogStatus');
+      if (status) {
+        status.textContent = 'Les produits déjà présents dans la boutique n’ont pas pu être actualisés.';
+        status.hidden = false;
+      }
+    }
   } catch (error) {
     managedCatalogLoadError = true;
     console.error('Impossible de charger le catalogue Supabase :', error);
@@ -674,6 +752,10 @@ function setupProductPage() {
 
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id') || 'p1';
+  if (inactiveLegacyProducts.has(id)) {
+    container.innerHTML = '<p class="catalog-status" role="alert">Ce produit n’est plus disponible dans la boutique.</p>';
+    return;
+  }
   const isPhoneCatalog = id === 'iphone-catalog';
   const isTechRequest = id === 'p6';
   const isJerseyCatalog = id === 'p2';
@@ -686,12 +768,13 @@ function setupProductPage() {
     container.innerHTML = `<p class="catalog-status" role="alert">${message}</p>`;
     return;
   }
-  const phoneDisplayOrder = ['p14', 'p15', 'p16', 'p17', 'p18', 'p19', 'p20', 'p21', 'p3', 'p25', 'p22', 'p24', 'p23', 'p26', 'p27', 'p28'];
+  const phoneDisplayOrder = ['p14', 'p15', 'p16', 'p17', 'p18', 'p19', 'p20', 'p21', 'p3', 'p25', 'p22', 'p24', 'p23', 'p26', 'p27', 'p28']
+    .filter((phoneId) => !inactiveLegacyProducts.has(phoneId));
   const jerseyTeams = ['Paris Saint-Germain (PSG)', 'FC Barcelone', 'Bayern Munich', 'Manchester United', 'Manchester City', 'Chelsea', 'Atlético Madrid'];
   let selectedJerseyTeam = jerseyTeams[0];
   let selectedJerseyType = 'Simple';
-  let selectedJerseyPrice = 5000;
-  let selectedPhone = product;
+  let selectedJerseyPrice = Number(product.price);
+  let selectedPhone = isPhoneCatalog ? CATALOG[phoneDisplayOrder[0]] || product : product;
   const productSizes = product.sizes || [];
   const productColors = product.colors || [];
   let selectedSize = productSizes[0] || null;
@@ -844,7 +927,7 @@ function setupProductPage() {
     const updateJersey = () => {
       selectedJerseyTeam = teamSelect?.value || jerseyTeams[0];
       selectedJerseyType = typeSelect?.value || 'Simple';
-      selectedJerseyPrice = selectedJerseyType === 'Pro' ? 10000 : 5000;
+      selectedJerseyPrice = Number(product.price) * (selectedJerseyType === 'Pro' ? 2 : 1);
       if (priceElement) priceElement.textContent = formatPrice(selectedJerseyPrice);
       if (featuresElement) {
         featuresElement.innerHTML = [

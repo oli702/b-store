@@ -41,6 +41,7 @@
 
   <section class="section">
     <div class="container product-detail" id="productDetail"></div>
+    <p id="managedCatalogStatus" class="catalog-status" role="status" aria-live="polite" hidden></p>
   </section>
 
   <section class="section section--alt">
@@ -97,6 +98,9 @@
 
   <div class="toast" id="toast">Produit ajouté au panier ✅</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="catalog-data.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

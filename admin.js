@@ -38,6 +38,54 @@ function formatPrice(value) {
   return `${Number(value || 0).toLocaleString('fr-FR')} FCFA`;
 }
 
+async function loadLegacyProducts() {
+  const [pageResponse, overridesResult] = await Promise.all([
+    fetch('index.html', { cache: 'no-store' }),
+    client.from('product_overrides').select('*')
+  ]);
+  if (!pageResponse.ok) throw new Error('Impossible de lire le catalogue actuel de la boutique.');
+  if (overridesResult.error) throw overridesResult.error;
+
+  const page = new DOMParser().parseFromString(await pageResponse.text(), 'text/html');
+  const overrides = new Map((overridesResult.data || []).map((item) => [item.product_id, item]));
+  const homepageProducts = Array.from(page.querySelectorAll('#productsGrid > .product-card[data-id]'))
+    .filter((card) => card.dataset.id !== 'iphone-catalog')
+    .map((card) => {
+      const legacyId = card.dataset.id;
+      const override = overrides.get(legacyId);
+      return {
+        id: `legacy:${legacyId}`,
+        legacy: true,
+        legacy_id: legacyId,
+        name: override?.name || card.dataset.name || card.querySelector('h3')?.textContent.trim() || '',
+        category: override?.category || card.dataset.cat || '',
+        price: Number(override?.price ?? card.dataset.price ?? 0),
+        image_url: new URL(override?.image_url || card.dataset.img || '', window.location.href).href,
+        stock: 0,
+        active: override?.active ?? true,
+        sizes: [],
+        description: ''
+      };
+    });
+  const phoneProducts = (window.BSTORE_PHONE_CATALOG || []).map((phone) => {
+    const override = overrides.get(phone.id);
+    return {
+      id: `legacy:${phone.id}`,
+      legacy: true,
+      legacy_id: phone.id,
+      name: override?.name || phone.name,
+      category: override?.category || 'telephones',
+      price: Number(override?.price ?? phone.price),
+      image_url: new URL(override?.image_url || window.BSTORE_PHONE_CATALOG_IMAGE, window.location.href).href,
+      stock: 0,
+      active: override?.active ?? true,
+      sizes: phone.storage ? [phone.storage] : [],
+      description: ''
+    };
+  });
+  return [...homepageProducts, ...phoneProducts];
+}
+
 function setAuthenticated(user) {
   loginPanel.hidden = Boolean(user);
   dashboard.hidden = !user;
@@ -73,21 +121,26 @@ function renderInventory() {
       <img src="${escapeHtml(product.image_url)}" alt="" loading="lazy">
       <div>
         <h3>${escapeHtml(product.name)}</h3>
-        <p>${formatPrice(product.price)} · Stock : ${Number(product.stock)} · ${product.active ? 'Publié' : 'Masqué'}</p>
+        <p>${formatPrice(product.price)}${product.legacy ? '' : ` · Stock : ${Number(product.stock)}`} · ${product.active ? 'Publié' : 'Masqué'}</p>
         <p>${escapeHtml(product.category)}</p>
+        ${product.legacy ? '<p>Catalogue initial de la boutique</p>' : ''}
       </div>
       <div class="inventory-card__actions">
         <button class="admin-button admin-button--secondary" type="button" data-edit-product="${escapeHtml(product.id)}">Modifier</button>
-        <button class="admin-button admin-button--secondary" type="button" data-toggle-product="${escapeHtml(product.id)}">${product.active ? 'Masquer' : 'Publier'}</button>
+        <button class="admin-button admin-button--secondary" type="button" data-toggle-product="${escapeHtml(product.id)}">${product.legacy ? (product.active ? 'Retirer de la boutique' : 'Réactiver') : (product.active ? 'Masquer' : 'Publier')}</button>
+        ${product.legacy ? '' : `<button class="admin-button admin-button--danger" type="button" data-delete-product="${escapeHtml(product.id)}">Supprimer</button>`}
       </div>
     </article>`).join('');
 }
 
 async function loadInventory() {
   inventoryList.innerHTML = '<p class="inventory-empty">Chargement des produits…</p>';
-  const { data, error } = await client.rpc('get_admin_products');
+  const [{ data, error }, legacyProducts] = await Promise.all([
+    client.rpc('get_admin_products'),
+    loadLegacyProducts()
+  ]);
   if (error) throw error;
-  products = data || [];
+  products = [...(data || []), ...legacyProducts];
   renderInventory();
 }
 
@@ -278,9 +331,19 @@ productForm.addEventListener('submit', async (event) => {
       active: document.getElementById('productActive').checked,
       updated_at: new Date().toISOString()
     };
-    const result = id
-      ? await client.from('products').update(product).eq('id', id)
-      : await client.from('products').insert(product);
+    const result = id.startsWith('legacy:')
+      ? await client.from('product_overrides').upsert({
+        product_id: id.slice('legacy:'.length),
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        image_url: product.image_url,
+        active: product.active,
+        updated_at: product.updated_at
+      }, { onConflict: 'product_id' })
+      : id
+        ? await client.from('products').update(product).eq('id', id)
+        : await client.from('products').insert(product);
     if (result.error) throw result.error;
     resetProductForm();
     await loadInventory();
@@ -301,8 +364,11 @@ document.getElementById('refreshInventory').addEventListener('click', async () =
 inventoryList.addEventListener('click', async (event) => {
   const editButton = event.target.closest('[data-edit-product]');
   const toggleButton = event.target.closest('[data-toggle-product]');
-  const product = products.find((item) => item.id === (editButton || toggleButton)?.dataset.editProduct
-    || item.id === toggleButton?.dataset.toggleProduct);
+  const deleteButton = event.target.closest('[data-delete-product]');
+  const actionButton = editButton || toggleButton || deleteButton;
+  const product = products.find((item) => item.id === actionButton?.dataset.editProduct
+    || item.id === actionButton?.dataset.toggleProduct
+    || item.id === actionButton?.dataset.deleteProduct);
   if (!product) return;
   if (editButton) {
     document.getElementById('productId').value = product.id;
@@ -322,15 +388,50 @@ inventoryList.addEventListener('click', async (event) => {
   if (toggleButton) {
     toggleButton.disabled = true;
     try {
-      const { error } = await client.from('products')
-        .update({ active: !product.active, updated_at: new Date().toISOString() })
-        .eq('id', product.id);
+      const updatedAt = new Date().toISOString();
+      const result = product.legacy
+        ? await client.from('product_overrides').upsert({
+          product_id: product.legacy_id,
+          name: product.name,
+          category: product.category,
+          price: product.price,
+          image_url: product.image_url,
+          active: !product.active,
+          updated_at: updatedAt
+        }, { onConflict: 'product_id' })
+        : await client.from('products')
+          .update({ active: !product.active, updated_at: updatedAt })
+          .eq('id', product.id);
+      const { error } = result;
       if (error) throw error;
       await loadInventory();
-      showStatus(product.active ? 'Produit masqué de la boutique.' : 'Produit publié dans la boutique.');
+      showStatus(product.legacy
+        ? (product.active ? 'Produit retiré de la boutique.' : 'Produit réactivé dans la boutique.')
+        : (product.active ? 'Produit masqué de la boutique.' : 'Produit publié dans la boutique.'));
     } catch (error) {
       showStatus(error.message || 'Impossible de modifier la publication du produit.', 'error');
     } finally { toggleButton.disabled = false; }
+  }
+  if (deleteButton) {
+    if (!window.confirm(`Supprimer définitivement le produit « ${product.name} » ?`)) return;
+    deleteButton.disabled = true;
+    try {
+      const { error } = await client.from('products').delete().eq('id', product.id);
+      if (error) throw error;
+      if (document.getElementById('productId').value === product.id) resetProductForm();
+    } catch (error) {
+      showStatus(error.message || 'Impossible de supprimer le produit.', 'error');
+      deleteButton.disabled = false;
+      return;
+    }
+    try {
+      await loadInventory();
+      showStatus('Produit supprimé.');
+    } catch (error) {
+      showStatus(`Produit supprimé, mais l’inventaire n’a pas pu être actualisé : ${error.message || 'erreur inconnue.'}`, 'error');
+    } finally {
+      deleteButton.disabled = false;
+    }
   }
 });
 
