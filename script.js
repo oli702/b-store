@@ -680,6 +680,18 @@ function setupCartModal() {
   });
 }
 
+function setupJerseyImageFallback() {
+  const isJerseyPage = new URLSearchParams(window.location.search).get('id') === 'p2';
+  document.querySelectorAll('img').forEach((image) => {
+    if (!image.closest('[data-id="p2"]') && !(isJerseyPage && image.closest('#productDetail'))) return;
+    image.addEventListener('error', () => {
+      if (image.dataset.fallbackApplied) return;
+      image.dataset.fallbackApplied = 'true';
+      image.src = 'assets/club-jersey.svg';
+    });
+  });
+}
+
 function setupAddToCart() {
   document.querySelectorAll('.add-to-cart').forEach((button) => {
     button.addEventListener('click', (event) => {
@@ -1319,6 +1331,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAddToCart();
     setupCartModal();
     setupProductPage();
+    setupJerseyImageFallback();
     setupCheckoutForm();
     Cart.updateUI();
   });

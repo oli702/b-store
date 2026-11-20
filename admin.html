@@ -61,8 +61,12 @@
           <input id="productPrice" type="number" min="0" step="1" required>
           <label for="productStock">Stock</label>
           <input id="productStock" type="number" min="0" step="1" required>
-          <label for="productImage">Adresse de la photo</label>
-          <input id="productImage" type="url" required placeholder="https://...">
+          <label for="productImage">Adresse de la photo (lien direct https://...)</label>
+          <input id="productImage" type="url" placeholder="https://exemple.com/photo.jpg">
+          <label for="productImageFile">Ou choisir une image sur cet appareil</label>
+          <input id="productImageFile" type="file" accept="image/*">
+          <img id="productImagePreview" class="product-image-preview" alt="Aperçu de la photo du produit" hidden>
+          <p id="productImageHint" class="admin-muted" aria-live="polite">Ajoute un lien direct vers une image ou sélectionne un fichier.</p>
           <label for="productSizes">Tailles / options (séparées par des virgules)</label>
           <input id="productSizes" placeholder="38, 39, 40, 41, 42, 43, 44, 45">
           <label for="productDescription">Description</label>
@@ -126,6 +130,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="catalog-data.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

@@ -18,6 +18,7 @@ if (window.supabase?.createClient && config.url && config.anonKey) {
 let products = [];
 let orders = [];
 let ordersLoaded = false;
+let imagePreviewObjectUrl = '';
 
 const paymentLabels = { pending: 'En attente', paid: 'Payé', failed: 'Échoué', refunded: 'Remboursé' };
 const deliveryLabels = { new: 'Nouvelle', confirmed: 'Confirmée', shipping: 'En livraison', delivered: 'Livrée', canceled: 'Annulée' };
@@ -146,11 +147,74 @@ async function loadInventory() {
 
 function resetProductForm() {
   productForm.reset();
+  clearProductImagePreview();
   document.getElementById('productId').value = '';
   document.getElementById('productActive').checked = true;
   document.getElementById('productFormTitle').textContent = 'Ajouter un produit';
   document.getElementById('cancelProductEdit').hidden = true;
 }
+
+function clearProductImagePreview() {
+  if (imagePreviewObjectUrl) {
+    URL.revokeObjectURL(imagePreviewObjectUrl);
+    imagePreviewObjectUrl = '';
+  }
+  const preview = document.getElementById('productImagePreview');
+  preview.removeAttribute('src');
+  preview.hidden = true;
+  document.getElementById('productImageHint').textContent =
+    'Ajoute un lien direct vers une image ou sélectionne un fichier.';
+}
+
+function showProductImagePreview(source, hint = 'Aperçu de la photo sélectionnée.') {
+  const preview = document.getElementById('productImagePreview');
+  preview.src = source;
+  preview.hidden = false;
+  document.getElementById('productImageHint').textContent = hint;
+}
+
+document.getElementById('productImage').addEventListener('input', (event) => {
+  const fileInput = document.getElementById('productImageFile');
+  fileInput.value = '';
+  if (imagePreviewObjectUrl) {
+    URL.revokeObjectURL(imagePreviewObjectUrl);
+    imagePreviewObjectUrl = '';
+  }
+  const value = event.currentTarget.value.trim();
+  if (!value) {
+    clearProductImagePreview();
+    return;
+  }
+  try {
+    const url = new URL(value);
+    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('URL non prise en charge');
+    showProductImagePreview(url.href, 'Vérifie que le lien pointe directement vers une image publique.');
+  } catch {
+    document.getElementById('productImagePreview').hidden = true;
+    document.getElementById('productImageHint').textContent = 'Saisis une adresse complète commençant par https://.';
+  }
+});
+
+document.getElementById('productImageFile').addEventListener('change', (event) => {
+  const file = event.currentTarget.files[0];
+  if (!file) return;
+  document.getElementById('productImage').value = '';
+  clearProductImagePreview();
+  imagePreviewObjectUrl = URL.createObjectURL(file);
+  showProductImagePreview(imagePreviewObjectUrl, `${file.name} — aperçu avant enregistrement.`);
+});
+
+document.getElementById('productImagePreview').addEventListener('error', () => {
+  document.getElementById('productImageHint').textContent =
+    'Cette image ne peut pas être affichée. Vérifie le lien ou sélectionne le fichier image.';
+});
+
+inventoryList.addEventListener('error', (event) => {
+  if (event.target instanceof HTMLImageElement && event.target.matches('.inventory-card img')) {
+    event.target.classList.add('is-unavailable');
+    event.target.alt = 'Image indisponible';
+  }
+}, true);
 
 function renderOrders() {
   const query = document.getElementById('orderSearch').value.trim().toLocaleLowerCase('fr');
@@ -318,14 +382,33 @@ productForm.addEventListener('submit', async (event) => {
   button.disabled = true;
   try {
     const id = document.getElementById('productId').value;
-    const imageUrl = new URL(document.getElementById('productImage').value.trim());
-    if (!['http:', 'https:'].includes(imageUrl.protocol)) throw new Error('La photo doit utiliser une adresse HTTP ou HTTPS.');
+    const imageFile = document.getElementById('productImageFile').files[0];
+    let imageUrl;
+    if (imageFile) {
+      if (!imageFile.type.startsWith('image/')) throw new Error('Le fichier choisi doit être une image.');
+      if (imageFile.size > 5 * 1024 * 1024) throw new Error('L’image ne doit pas dépasser 5 Mo.');
+      const safeFileName = imageFile.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+      const imagePath = `${crypto.randomUUID()}-${safeFileName}`;
+      const { data: uploadedImage, error: uploadError } = await client.storage
+        .from('product-images')
+        .upload(imagePath, imageFile, { cacheControl: '3600', contentType: imageFile.type });
+      if (uploadError) throw uploadError;
+      imageUrl = client.storage.from('product-images').getPublicUrl(uploadedImage.path).data.publicUrl;
+    } else {
+      const imageValue = document.getElementById('productImage').value.trim();
+      if (!imageValue) throw new Error('Ajoute un lien d’image ou sélectionne un fichier.');
+      const parsedImageUrl = new URL(imageValue);
+      if (!['http:', 'https:'].includes(parsedImageUrl.protocol)) {
+        throw new Error('La photo doit utiliser une adresse HTTP ou HTTPS.');
+      }
+      imageUrl = parsedImageUrl.href;
+    }
     const product = {
       name: document.getElementById('productName').value.trim(),
       category: document.getElementById('productCategory').value,
       price: Number(document.getElementById('productPrice').value),
       stock: Number(document.getElementById('productStock').value),
-      image_url: imageUrl.href,
+      image_url: imageUrl,
       sizes: document.getElementById('productSizes').value.split(',').map((value) => value.trim()).filter(Boolean),
       description: document.getElementById('productDescription').value.trim(),
       active: document.getElementById('productActive').checked,
@@ -377,6 +460,9 @@ inventoryList.addEventListener('click', async (event) => {
     document.getElementById('productPrice').value = product.price;
     document.getElementById('productStock').value = product.stock;
     document.getElementById('productImage').value = product.image_url;
+    document.getElementById('productImageFile').value = '';
+    clearProductImagePreview();
+    showProductImagePreview(product.image_url, 'Ajoute un lien direct vers une image ou sélectionne un fichier.');
     document.getElementById('productSizes').value = (product.sizes || []).join(', ');
     document.getElementById('productDescription').value = product.description || '';
     document.getElementById('productActive').checked = product.active;
