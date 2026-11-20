@@ -39,6 +39,14 @@ function formatPrice(value) {
   return `${Number(value || 0).toLocaleString('fr-FR')} FCFA`;
 }
 
+function getLegacyImageUrl(productId, savedUrl, fallbackUrl) {
+  const imageUrl = savedUrl || fallbackUrl || '';
+  if (productId === 'p2' && /(?:club-jersey-reference\.webp|club-jersey\.svg)(?:[?#]|$)/i.test(imageUrl)) {
+    return 'assets/psg-maillot.png';
+  }
+  return imageUrl;
+}
+
 async function loadLegacyProducts() {
   const [pageResponse, overridesResult] = await Promise.all([
     fetch('index.html', { cache: 'no-store' }),
@@ -61,7 +69,7 @@ async function loadLegacyProducts() {
         name: override?.name || card.dataset.name || card.querySelector('h3')?.textContent.trim() || '',
         category: override?.category || card.dataset.cat || '',
         price: Number(override?.price ?? card.dataset.price ?? 0),
-        image_url: new URL(override?.image_url || card.dataset.img || '', window.location.href).href,
+        image_url: new URL(getLegacyImageUrl(legacyId, override?.image_url, card.dataset.img), window.location.href).href,
         stock: 0,
         active: override?.active ?? true,
         sizes: [],

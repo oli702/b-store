@@ -315,6 +315,13 @@ function renderManagedProductCard(product) {
 let managedCatalogLoadError = false;
 const inactiveLegacyProducts = new Set();
 
+function getLegacyImageUrl(productId, savedUrl) {
+  if (productId === 'p2' && /(?:club-jersey-reference\.webp|club-jersey\.svg)(?:[?#]|$)/i.test(savedUrl)) {
+    return new URL('assets/psg-maillot.png', window.location.href).href;
+  }
+  return new URL(savedUrl, window.location.href).href;
+}
+
 function applyLegacyProductOverrides(rows) {
   const categoryLabels = {
     chaussures: 'Chaussures',
@@ -330,7 +337,7 @@ function applyLegacyProductOverrides(rows) {
     if (active) inactiveLegacyProducts.delete(productId);
     else inactiveLegacyProducts.add(productId);
 
-    const imageUrl = new URL(row.image_url, window.location.href);
+    const imageUrl = new URL(getLegacyImageUrl(productId, row.image_url));
     if (!['http:', 'https:'].includes(imageUrl.protocol)) {
       throw new Error(`L’image du produit « ${row.name} » doit utiliser une adresse HTTP ou HTTPS.`);
     }
