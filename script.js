@@ -69,8 +69,8 @@ const CATALOG = {
     cat: 'Maillots',
     category: 'maillots',
     optionLabel: 'Taille',
-    img: 'assets/club-jersey-reference.webp',
-    gallery: ['assets/club-jersey-reference.webp'],
+    img: 'assets/psg-maillot.png',
+    gallery: ['assets/psg-maillot.png'],
     desc: 'Maillots de la saison actuelle pour les grands clubs. Choisissez votre équipe, le modèle simple ou pro, puis votre taille.',
     sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     features: ['Modèle simple : 5 000 FCFA', 'Modèle pro : 10 000 FCFA', 'Équipe et disponibilité à confirmer']
@@ -687,7 +687,7 @@ function setupJerseyImageFallback() {
     image.addEventListener('error', () => {
       if (image.dataset.fallbackApplied) return;
       image.dataset.fallbackApplied = 'true';
-      image.src = 'assets/club-jersey.svg';
+      image.src = 'assets/psg-maillot.png';
     });
   });
 }
